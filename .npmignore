@@ -1,0 +1,10 @@
+.vscode
+docs
+example
+node_modules/
+scripts/
+.eslintignore
+.eslintrc.cjs
+.gitignore
+.prettierrc.js
+tsconfig.json

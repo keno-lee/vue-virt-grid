@@ -1,0 +1,104 @@
+.hyd-popper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 100000;
+
+  .popper__arrow {
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 6px;
+    filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 3%));
+
+    &::after {
+      position: absolute;
+      display: block;
+      width: 0;
+      height: 0;
+      border-color: transparent;
+      border-style: solid;
+      content: ' ';
+      border-width: 6px;
+    }
+  }
+
+  --hyd-popper-arrow-left: 50%;
+  --hyd-popper-arrow-top: calc(50% - 6px);
+
+  &[x-placement$='start'] {
+    --hyd-popper-arrow-left: 10%;
+    --hyd-popper-arrow-top: 10%;
+  }
+
+  &[x-placement$='end'] {
+    --hyd-popper-arrow-left: calc(90% - 12px);
+    --hyd-popper-arrow-top: calc(90% - 12px);
+  }
+
+  --hyd-popper-arrow-color: #ccc;
+  --hyd-popper-arrow-background-color: #fff;
+
+  &[x-placement^='top'] .popper__arrow {
+    bottom: -6px;
+    left: var(--hyd-popper-arrow-left);
+    margin-right: 2px;
+    border-top-color: var(--hyd-popper-arrow-color);
+    border-bottom-width: 0;
+
+    &::after {
+      bottom: 1px;
+      margin-left: -6px;
+      border-top-color: var(--hyd-popper-arrow-background-color);
+      border-bottom-width: 0;
+    }
+  }
+
+  &[x-placement^='bottom'] .popper__arrow {
+    top: -6px;
+    left: var(--hyd-popper-arrow-left);
+    margin-right: 2px;
+    border-top-width: 0;
+    border-bottom-color: var(--hyd-popper-arrow-color);
+
+    &::after {
+      top: 1px;
+      margin-left: -6px;
+      border-top-width: 0;
+      border-bottom-color: var(--hyd-popper-arrow-background-color);
+    }
+  }
+
+  &[x-placement^='right'] .popper__arrow {
+    top: var(--hyd-popper-arrow-top);
+    left: -6px;
+    margin-bottom: 2px;
+    border-right-color: var(--hyd-popper-arrow-color);
+    border-left-width: 0;
+
+    &::after {
+      bottom: -6px;
+      left: 1px;
+      border-right-color: var(--hyd-popper-arrow-background-color);
+      border-left-width: 0;
+    }
+  }
+
+  &[x-placement^='left'] .popper__arrow {
+    top: var(--hyd-popper-arrow-top);
+    right: -6px;
+    margin-bottom: 2px;
+    border-right-width: 0;
+    border-left-color: var(--hyd-popper-arrow-color);
+
+    &::after {
+      right: 1px;
+      bottom: -6px;
+      border-right-width: 0;
+      border-left-color: var(--hyd-popper-arrow-background-color);
+    }
+  }
+}

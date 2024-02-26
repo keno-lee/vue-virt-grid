@@ -1,0 +1,68 @@
+cache:
+  paths:
+    - node_modules/
+variables:
+  LANGUAGE: vue
+  PROJECT_NAME: kita-grid
+before_script:
+  - echo "npm version "
+  - npm -v
+  - pnpm install
+stages:
+  - docs
+  - publish
+
+docs_dev:
+  stage: docs
+  only:
+    refs:
+      - develop
+  artifacts:
+    paths:
+      - docs
+  script:
+    - cd example
+    - pnpm install
+    - pnpm run build:docs
+    - cd ..
+    - pnpm run build
+    - cp -r lib/ docs/public/lib/ 
+    - cp package.json docs/public/package.json
+    - rm docs/public/lib/index.js.map
+    - DIST_PATH=docs/ typhon-ng pack
+  tags:
+    - frontend-docker
+
+docs_prd:
+  stage: docs
+  only:
+    refs:
+      - master
+  artifacts:
+    paths:
+      - dist
+  script:
+    - DIST_PATH=dist/ typhon-ng pack
+  tags:
+    - frontend-docker
+
+publish_beta:
+  stage: publish
+  only:
+    refs:
+      - /^v\d+\.\d+\.\d+-beta.\d+$/
+  script:
+    - npm publish --tag beta
+  tags:
+    - frontend-docker
+
+publish:
+  stage: publish
+  only:
+    refs:
+      - /^v\d+\.\d+\.\d+$/
+  script:
+    - npm run build
+    - npm publish
+  tags:
+    - frontend-docker

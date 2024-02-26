@@ -1,0 +1,478 @@
+@import './theme.scss';
+
+@mixin scrollbar {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--#{$prefix}-scrollbar-thumb-color);
+    border-radius: 10px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--#{$prefix}-scrollbar-thumb-color-hover);
+  }
+
+  ::-webkit-scrollbar-track {
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+}
+
+@mixin reset {
+  // 初始化表格样式
+  table,
+  thead,
+  tbody,
+  tfoot,
+  th,
+  tr,
+  td {
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+  }
+}
+
+// 顶层元素
+.kita-grid-root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+
+  @include reset;
+  @include scrollbar;
+}
+
+// 主体容器
+.kita-grid-main {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+
+  // 边框样式
+  &.kita-grid-main--border {
+    border: var(--#{$prefix}-border);
+
+    th.kita-grid-th {
+      border-right: var(--#{$prefix}-border);
+    }
+
+    td.kita-grid-td {
+      border-right: var(--#{$prefix}-border);
+    }
+  }
+}
+
+.kita-grid-mask {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--#{$prefix}-header-text-color);
+}
+
+// 表格
+table.kita-grid-table {
+  border-collapse: separate;
+  min-width: 100%;
+  table-layout: fixed;
+  border-spacing: 0;
+  outline: none;
+  background-color: var(--#{$prefix}-bg-color);
+
+  // 固定列样式
+  .kita-grid-th.is-fixed--left.is-last-column::before,
+  .kita-grid-th.is-fixed--right.is-first-column::before,
+  .kita-grid-td.is-fixed--left.is-last-column::before,
+  .kita-grid-td.is-fixed--right.is-first-column::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 10px;
+    bottom: -1px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    box-shadow: none;
+    touch-action: none;
+    pointer-events: none;
+  }
+
+  .kita-grid-th.is-fixed--left.is-last-column::before,
+  .kita-grid-td.is-fixed--left.is-last-column::before {
+    right: -10px;
+  }
+
+  .kita-grid-th.is-fixed--right.is-first-column::before,
+  .kita-grid-td.is-fixed--right.is-first-column::before {
+    left: -10px;
+  }
+
+  &.is-scrolling-none {
+    .kita-grid-th.is-fixed--left.is-last-column::before,
+    .kita-grid-td.is-fixed--left.is-last-column::before,
+    .kita-grid-th.is-fixed--right.is-first-column::before,
+    .kita-grid-td.is-fixed--right.is-first-column::before {
+      box-shadow: none;
+    }
+  }
+
+  &.is-scrolling-left {
+    .kita-grid-th.is-fixed.is-fixed--right.is-first-column::before,
+    .kita-grid-td.is-fixed.is-fixed--right.is-first-column::before {
+      box-shadow: var(--#{$prefix}-fixed-right-column);
+    }
+  }
+
+  &.is-scrolling-right {
+    .kita-grid-th.is-fixed.is-fixed--left.is-last-column,
+    .kita-grid-td.is-fixed.is-fixed--left.is-last-column {
+      border-right: 0;
+      &::before {
+        box-shadow: var(--#{$prefix}-fixed-left-column);
+      }
+    }
+  }
+
+  &.is-scrolling-middle {
+    .kita-grid-th.is-fixed.is-fixed--right.is-first-column::before,
+    .kita-grid-td.is-fixed.is-fixed--right.is-first-column::before {
+      box-shadow: var(--#{$prefix}-fixed-right-column);
+    }
+    .kita-grid-th.is-fixed.is-fixed--left.is-last-column,
+    .kita-grid-td.is-fixed.is-fixed--left.is-last-column {
+      border-right: 0;
+      &::before {
+        box-shadow: var(--#{$prefix}-fixed-left-column);
+      }
+    }
+  }
+}
+
+// 表头属性
+thead.kita-grid-header {
+  z-index: 6;
+  position: sticky;
+  top: 0;
+  background-color: var(--#{$prefix}-header-bg-color);
+  color: var(--#{$prefix}-header-text-color);
+
+  tr.kita-grid-tr {
+    box-sizing: border-box;
+  }
+
+  th.kita-grid-th {
+    box-sizing: border-box;
+    font-weight: 600;
+    border-bottom: var(--#{$prefix}-border);
+    height: 36px;
+    min-width: 0;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    position: relative;
+    text-align: left;
+    z-index: 1;
+
+    .kita-grid-th-cell {
+      padding: 8px 12px;
+    }
+
+    &.is-fixed {
+      z-index: 4;
+      position: sticky;
+      background-color: var(--#{$prefix}-header-bg-color);
+    }
+  }
+}
+
+// 表格内容
+tbody.kita-grid-body {
+  tr.kita-grid-tr {
+    box-sizing: border-box;
+    background-color: var(--#{$prefix}-tr-bg-color);
+
+    &.kita-grid-tr--striped {
+      td.kita-grid-td {
+        background-color: var(--#{$prefix}-row-stripe-bg-color);
+      }
+    }
+
+    &.current-row {
+      td.kita-grid-td {
+        background-color: var(--#{$prefix}-current-row-bg-color);
+      }
+    }
+
+    &:hover {
+      & > td.kita-grid-td {
+        background-color: var(--#{$prefix}-row-hover-bg-color);
+      }
+
+      td.kita-grid-td.kita-grid-td--expand {
+        background-color: var(--#{$prefix}-expanded-cell-bg-color);
+      }
+    }
+  }
+
+  td.kita-grid-td {
+    border-bottom: var(--#{$prefix}-border);
+    min-width: 0;
+    box-sizing: border-box;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    position: relative;
+    text-align: left;
+    z-index: 1;
+
+    &:has(.kita-grid-cell__index) {
+      z-index: var(--#{$prefix}-index);
+    }
+
+    &.kita-grid-td--expand {
+      background-color: var(--#{$prefix}-expanded-cell-bg-color);
+    }
+
+    &.kita-grid-td--group {
+      div.kita-grid-cell {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 8px 4px;
+      }
+    }
+
+    &.current-column {
+      background-color: var(--#{$prefix}-current-column-bg-color);
+    }
+
+    &.is-fixed {
+      z-index: 4;
+      position: sticky;
+      background-color: var(--#{$prefix}-bg-color);
+    }
+
+    // 框选
+    &.box-selection {
+      z-index: 2;
+      background-color: var(--#{$prefix}-select-bg-color) !important;
+
+      &::after {
+        display: block;
+        content: ' ';
+        z-index: -1;
+        position: absolute;
+        pointer-events: none;
+        height: calc(100% + 2px);
+        width: calc(100% + 2px);
+        left: -1px;
+        box-sizing: border-box;
+        top: -1px;
+        border: 0 solid var(--#{$prefix}-select-border-color);
+      }
+
+      &.box-selection__left-top {
+        &::after {
+          border-left-width: 2px;
+          border-top-width: 2px;
+        }
+      }
+
+      &.box-selection__top {
+        &::after {
+          border-top-width: 2px;
+        }
+      }
+
+      &.box-selection__right-top {
+        &::after {
+          border-right-width: 2px;
+          border-top-width: 2px;
+        }
+      }
+
+      &.box-selection__right {
+        &::after {
+          border-right-width: 2px;
+        }
+      }
+
+      &.box-selection__right-bottom {
+        &::after {
+          border-right-width: 2px;
+          border-bottom-width: 2px;
+        }
+      }
+
+      &.box-selection__bottom {
+        &::after {
+          border-bottom-width: 2px;
+        }
+      }
+
+      &.box-selection__left-bottom {
+        &::after {
+          border-left-width: 2px;
+          border-bottom-width: 2px;
+        }
+      }
+
+      &.box-selection__left {
+        &::after {
+          border-left-width: 2px;
+        }
+      }
+    }
+  }
+
+  div.kita-grid-cell {
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-all;
+    // line-height: 23px;
+    padding: 8px 12px;
+
+    &.kita-grid-cell__index {
+      text-align: center;
+      padding: 0;
+    }
+
+    &.kita-grid-cell__checkbox {
+      text-align: center;
+    }
+  }
+
+  // 空白填充
+  .placement {
+    width: 20px;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+
+    &.placement--tree-line::before {
+      content: ' ';
+      position: absolute;
+      border-right: 1px dashed var(--#{$prefix}-tree-line-color);
+      height: 100%;
+      width: 2px;
+      top: 0;
+    }
+
+    &.placement--last-tree-node::before {
+      height: 50%;
+    }
+
+    &.placement--last-padding::after {
+      content: ' ';
+      position: absolute;
+      border-top: 1px dashed var(--#{$prefix}-tree-line-color);
+      height: 0;
+      width: 8px;
+      transform: translateX(5px);
+    }
+  }
+
+  // 分组icon
+  .group-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+
+    &.group-icon--expand {
+      transform: rotate(90deg);
+    }
+  }
+
+  // 树形节点icon
+  .tree-leading {
+    width: 20px;
+    height: 100%;
+
+    .tree-leading-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      transform: rotate(0deg);
+      transition: transform 0.2s ease-in-out;
+      cursor: pointer;
+
+      &.tree-leading--expand {
+        transform: rotate(90deg);
+      }
+    }
+
+    &.tree-leading--tree-line::after {
+      display: block;
+    }
+
+    &.tree-leading--tree-line-hide::after {
+      display: none;
+    }
+
+    &.tree-leading--first-node:not(:has(.tree-leading-icon)) {
+      display: none;
+    }
+
+    &:not(:has(.tree-leading-icon))::after {
+      content: ' ';
+      border-top: 1px dashed var(--#{$prefix}-tree-line-color);
+      position: absolute;
+      width: 8px;
+      height: 0;
+    }
+
+    &:has(.tree-leading-icon--expand)::after {
+      content: ' ';
+      border-right: 1px dashed var(--#{$prefix}-tree-line-color);
+      position: absolute;
+      width: 2px;
+      height: calc(50% - 10px);
+      transform: translateX(9px);
+    }
+  }
+
+  // 展开行icon
+  .row-expand-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+
+    &.row-expand-icon--expand {
+      transform: rotate(90deg);
+    }
+  }
+}
