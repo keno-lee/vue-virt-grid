@@ -5,6 +5,7 @@ export enum ColumnType {
   Index = 'index',
   Title = 'title',
   Checkbox = 'checkbox',
+  Radio = 'radio',
   Expand = 'expand',
   Text = 'text',
   // orderCheckbox = 'orderCheckbox',

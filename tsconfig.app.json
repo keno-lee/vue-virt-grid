@@ -1,14 +1,13 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "docs/**/*"],
   "exclude": ["src/**/__tests__/*", "example/**/__tests__/*"],
   "compilerOptions": {
-    "jsx": "preserve",
-
-    "composite": true,
     "baseUrl": ".",
+    "jsx": "preserve",
+    "composite": true,
     "paths": {
-      "@/example/*": ["./example/*"],
+      "vue-virt-grid": ["./src"],
       "@/src/*": ["./src/*"]
     }
   }

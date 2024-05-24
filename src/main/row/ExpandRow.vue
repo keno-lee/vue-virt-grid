@@ -1,7 +1,7 @@
 <template>
-  <tr ref="itemRefEl" class="kita-grid-tr">
-    <td class="kita-grid-td kita-grid-td--expand" :colspan="flattedColumns.length">
-      <div class="kita-grid-cell">
+  <tr ref="itemRefEl" class="vue-virt-grid-tr">
+    <td class="vue-virt-grid-td vue-virt-grid-td--expand" :colspan="flattedColumns.length">
+      <div class="vue-virt-grid-cell">
         <component :is="getRenderRow(row)"></component>
       </div>
     </td>
@@ -10,7 +10,8 @@
 <script setup lang="ts">
 import { inject, computed } from 'vue';
 import type { GridStore } from '@/src/store';
-import { useObserverItem } from 'vue-virt-list';
+// import { useObserverItem } from 'vue-virt-list';
+import { useObserverItem } from '../../virt';
 import { type ListItem } from '@/src/type';
 
 const gridStore = inject('gridStore') as GridStore;

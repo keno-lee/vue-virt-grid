@@ -1,5 +1,5 @@
 <template>
-  <div class="kita-grid-cell kita-grid-cell__index">
+  <div class="vue-virt-grid-cell vue-virt-grid-cell__index">
     {{ indexValue }}
   </div>
 </template>

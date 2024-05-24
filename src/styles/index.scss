@@ -42,7 +42,7 @@
 }
 
 // 顶层元素
-.kita-grid-root {
+.vue-virt-grid-root {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -54,27 +54,27 @@
 }
 
 // 主体容器
-.kita-grid-main {
+.vue-virt-grid-main {
   width: 100%;
   height: 100%;
   overflow: auto;
   position: relative;
 
   // 边框样式
-  &.kita-grid-main--border {
+  &.vue-virt-grid-main--border {
     border: var(--#{$prefix}-border);
 
-    th.kita-grid-th {
+    th.vue-virt-grid-th {
       border-right: var(--#{$prefix}-border);
     }
 
-    td.kita-grid-td {
+    td.vue-virt-grid-td {
       border-right: var(--#{$prefix}-border);
     }
   }
 }
 
-.kita-grid-mask {
+.vue-virt-grid-mask {
   width: 100%;
   height: 100%;
   overflow: auto;
@@ -89,8 +89,26 @@
   color: var(--#{$prefix}-header-text-color);
 }
 
+// 样式覆盖
+.vue-virt-grid-main--highlight-hover-row {
+  tr.vue-virt-grid-tr:hover {
+    & > td.vue-virt-grid-td {
+      background-color: var(--#{$prefix}-row-hover-bg-color);
+    }
+  }
+}
+
+// 暂时好像没用
+// .vue-virt-grid-main--highlight-hover-col {
+//   tr.vue-virt-grid-tr:hover {
+//     & > td.vue-virt-grid-td {
+//       background-color: var(--#{$prefix}-row-hover-bg-color);
+//     }
+//   }
+// }
+
 // 表格
-table.kita-grid-table {
+table.vue-virt-grid-table {
   border-collapse: separate;
   min-width: 100%;
   table-layout: fixed;
@@ -99,10 +117,10 @@ table.kita-grid-table {
   background-color: var(--#{$prefix}-bg-color);
 
   // 固定列样式
-  .kita-grid-th.is-fixed--left.is-last-column::before,
-  .kita-grid-th.is-fixed--right.is-first-column::before,
-  .kita-grid-td.is-fixed--left.is-last-column::before,
-  .kita-grid-td.is-fixed--right.is-first-column::before {
+  .vue-virt-grid-th.is-fixed--left.is-last-column::before,
+  .vue-virt-grid-th.is-fixed--right.is-first-column::before,
+  .vue-virt-grid-td.is-fixed--left.is-last-column::before,
+  .vue-virt-grid-td.is-fixed--right.is-first-column::before {
     content: '';
     position: absolute;
     top: 0;
@@ -115,35 +133,35 @@ table.kita-grid-table {
     pointer-events: none;
   }
 
-  .kita-grid-th.is-fixed--left.is-last-column::before,
-  .kita-grid-td.is-fixed--left.is-last-column::before {
+  .vue-virt-grid-th.is-fixed--left.is-last-column::before,
+  .vue-virt-grid-td.is-fixed--left.is-last-column::before {
     right: -10px;
   }
 
-  .kita-grid-th.is-fixed--right.is-first-column::before,
-  .kita-grid-td.is-fixed--right.is-first-column::before {
+  .vue-virt-grid-th.is-fixed--right.is-first-column::before,
+  .vue-virt-grid-td.is-fixed--right.is-first-column::before {
     left: -10px;
   }
 
   &.is-scrolling-none {
-    .kita-grid-th.is-fixed--left.is-last-column::before,
-    .kita-grid-td.is-fixed--left.is-last-column::before,
-    .kita-grid-th.is-fixed--right.is-first-column::before,
-    .kita-grid-td.is-fixed--right.is-first-column::before {
+    .vue-virt-grid-th.is-fixed--left.is-last-column::before,
+    .vue-virt-grid-td.is-fixed--left.is-last-column::before,
+    .vue-virt-grid-th.is-fixed--right.is-first-column::before,
+    .vue-virt-grid-td.is-fixed--right.is-first-column::before {
       box-shadow: none;
     }
   }
 
   &.is-scrolling-left {
-    .kita-grid-th.is-fixed.is-fixed--right.is-first-column::before,
-    .kita-grid-td.is-fixed.is-fixed--right.is-first-column::before {
+    .vue-virt-grid-th.is-fixed.is-fixed--right.is-first-column::before,
+    .vue-virt-grid-td.is-fixed.is-fixed--right.is-first-column::before {
       box-shadow: var(--#{$prefix}-fixed-right-column);
     }
   }
 
   &.is-scrolling-right {
-    .kita-grid-th.is-fixed.is-fixed--left.is-last-column,
-    .kita-grid-td.is-fixed.is-fixed--left.is-last-column {
+    .vue-virt-grid-th.is-fixed.is-fixed--left.is-last-column,
+    .vue-virt-grid-td.is-fixed.is-fixed--left.is-last-column {
       border-right: 0;
       &::before {
         box-shadow: var(--#{$prefix}-fixed-left-column);
@@ -152,12 +170,12 @@ table.kita-grid-table {
   }
 
   &.is-scrolling-middle {
-    .kita-grid-th.is-fixed.is-fixed--right.is-first-column::before,
-    .kita-grid-td.is-fixed.is-fixed--right.is-first-column::before {
+    .vue-virt-grid-th.is-fixed.is-fixed--right.is-first-column::before,
+    .vue-virt-grid-td.is-fixed.is-fixed--right.is-first-column::before {
       box-shadow: var(--#{$prefix}-fixed-right-column);
     }
-    .kita-grid-th.is-fixed.is-fixed--left.is-last-column,
-    .kita-grid-td.is-fixed.is-fixed--left.is-last-column {
+    .vue-virt-grid-th.is-fixed.is-fixed--left.is-last-column,
+    .vue-virt-grid-td.is-fixed.is-fixed--left.is-last-column {
       border-right: 0;
       &::before {
         box-shadow: var(--#{$prefix}-fixed-left-column);
@@ -167,18 +185,18 @@ table.kita-grid-table {
 }
 
 // 表头属性
-thead.kita-grid-header {
+thead.vue-virt-grid-header {
   z-index: 6;
   position: sticky;
   top: 0;
   background-color: var(--#{$prefix}-header-bg-color);
   color: var(--#{$prefix}-header-text-color);
 
-  tr.kita-grid-tr {
+  tr.vue-virt-grid-tr {
     box-sizing: border-box;
   }
 
-  th.kita-grid-th {
+  th.vue-virt-grid-th {
     box-sizing: border-box;
     font-weight: 600;
     border-bottom: var(--#{$prefix}-border);
@@ -190,8 +208,16 @@ thead.kita-grid-header {
     text-align: left;
     z-index: 1;
 
-    .kita-grid-th-cell {
+    .vue-virt-grid-th-cell {
       padding: 8px 12px;
+
+      &.vue-virt-grid-th-cell__checkbox {
+        // text-align: center;
+
+        .vue-virt-grid-th-cell__checkbox-title {
+          margin-left: 4px;
+        }
+      }
     }
 
     &.is-fixed {
@@ -203,35 +229,35 @@ thead.kita-grid-header {
 }
 
 // 表格内容
-tbody.kita-grid-body {
-  tr.kita-grid-tr {
+tbody.vue-virt-grid-body {
+  tr.vue-virt-grid-tr {
     box-sizing: border-box;
     background-color: var(--#{$prefix}-tr-bg-color);
 
-    &.kita-grid-tr--striped {
-      td.kita-grid-td {
+    &.vue-virt-grid-tr--striped {
+      td.vue-virt-grid-td {
         background-color: var(--#{$prefix}-row-stripe-bg-color);
       }
     }
 
     &.current-row {
-      td.kita-grid-td {
+      td.vue-virt-grid-td {
         background-color: var(--#{$prefix}-current-row-bg-color);
       }
     }
 
     &:hover {
-      & > td.kita-grid-td {
-        background-color: var(--#{$prefix}-row-hover-bg-color);
-      }
+      // & > td.vue-virt-grid-td {
+      //   background-color: var(--#{$prefix}-row-hover-bg-color);
+      // }
 
-      td.kita-grid-td.kita-grid-td--expand {
+      td.vue-virt-grid-td.vue-virt-grid-td--expand {
         background-color: var(--#{$prefix}-expanded-cell-bg-color);
       }
     }
   }
 
-  td.kita-grid-td {
+  td.vue-virt-grid-td {
     border-bottom: var(--#{$prefix}-border);
     min-width: 0;
     box-sizing: border-box;
@@ -241,16 +267,16 @@ tbody.kita-grid-body {
     text-align: left;
     z-index: 1;
 
-    &:has(.kita-grid-cell__index) {
+    &:has(.vue-virt-grid-cell__index) {
       z-index: var(--#{$prefix}-index);
     }
 
-    &.kita-grid-td--expand {
+    &.vue-virt-grid-td--expand {
       background-color: var(--#{$prefix}-expanded-cell-bg-color);
     }
 
-    &.kita-grid-td--group {
-      div.kita-grid-cell {
+    &.vue-virt-grid-td--group {
+      div.vue-virt-grid-cell {
         display: flex;
         align-items: center;
         width: 100%;
@@ -341,7 +367,7 @@ tbody.kita-grid-body {
     }
   }
 
-  div.kita-grid-cell {
+  div.vue-virt-grid-cell {
     box-sizing: border-box;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -350,13 +376,17 @@ tbody.kita-grid-body {
     // line-height: 23px;
     padding: 8px 12px;
 
-    &.kita-grid-cell__index {
+    &.vue-virt-grid-cell__index {
       text-align: center;
       padding: 0;
     }
 
-    &.kita-grid-cell__checkbox {
-      text-align: center;
+    &.vue-virt-grid-cell__checkbox {
+      // text-align: center;
+
+      .vue-virt-grid-cell__checkbox-filed {
+        margin-left: 4px;
+      }
     }
   }
 
@@ -424,7 +454,7 @@ tbody.kita-grid-body {
       transition: transform 0.2s ease-in-out;
       cursor: pointer;
 
-      &.tree-leading--expand {
+      &.tree-leading-icon--expand {
         transform: rotate(90deg);
       }
     }

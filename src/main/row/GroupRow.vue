@@ -1,7 +1,7 @@
 <template>
-  <tr ref="itemRefEl" class="kita-grid-tr kita-grid-tr--group">
-    <td class="kita-grid-td kita-grid-td--group" :colspan="flattedColumns.length">
-      <div class="kita-grid-cell" :style="`height: ${config.rowHeight}px;`">
+  <tr ref="itemRefEl" class="vue-virt-grid-tr vue-virt-grid-tr--group">
+    <td class="vue-virt-grid-td vue-virt-grid-td--group" :colspan="flattedColumns.length">
+      <div class="vue-virt-grid-cell" :style="`height: ${config.rowHeight}px;`">
         <Placement
           v-for="item in props.row.level"
           :key="item"
@@ -33,7 +33,8 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 import type { GridStore } from '@/src/store';
-import { useObserverItem } from 'vue-virt-list';
+// import { useObserverItem } from 'vue-virt-list';
+import { useObserverItem } from '../../virt';
 import { type ListItem } from '@/src/type';
 
 import Placement from '../Placement.vue';

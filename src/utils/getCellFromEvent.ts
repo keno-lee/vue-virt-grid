@@ -1,12 +1,12 @@
 export const getCellFromEvent = (e: MouseEvent) => {
   const cellRoot = e
-      .composedPath()
-      .find(
-        (v) =>
-          !(v as HTMLElement).classList?.contains('kita-grid-cell--unselectable') &&
-          (v as HTMLElement).dataset?.colidx &&
-          (v as HTMLElement).dataset?.rowidx,
-      ) as HTMLElement;
+    .composedPath()
+    .find(
+      (v) =>
+        !(v as HTMLElement).classList?.contains('vue-virt-grid-cell--unselectable') &&
+        (v as HTMLElement).dataset?.colidx &&
+        (v as HTMLElement).dataset?.rowidx,
+    ) as HTMLElement;
 
   if (cellRoot && cellRoot.dataset) {
     const { colidx, rowidx, colspan, rowspan } = cellRoot.dataset;
@@ -15,8 +15,8 @@ export const getCellFromEvent = (e: MouseEvent) => {
       colIndex: +(colidx || 0),
       rowspan: +(rowspan || 1),
       colspan: +(colspan || 1),
-    }
+    };
   }
 
-  return undefined
-}
+  return undefined;
+};

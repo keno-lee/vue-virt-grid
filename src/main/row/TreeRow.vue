@@ -1,5 +1,5 @@
 <template>
-  <tr ref="itemRefEl" class="kita-grid-tr-group">
+  <tr ref="itemRefEl" class="vue-virt-grid-tr-group">
     <td :colspan="flattedColumns.length">
       <div class="group" :style="`width: 100%; height: ${config.rowHeight}px;`">
         <Placement
@@ -18,7 +18,8 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 import type { GridStore } from '@/src/store';
-import { useObserverItem } from 'vue-virt-list';
+// import { useObserverItem } from 'vue-virt-list';
+import { useObserverItem } from '../../virt';
 import { type ListItem } from '@/src/type';
 
 import Placement from '../Placement.vue';
@@ -41,7 +42,7 @@ const { itemRefEl } = useObserverItem({ resizeObserver: props.resizeObserver as 
 console.log('itemRefEl', itemRefEl);
 </script>
 <style lang="scss">
-.kita-grid-tr-group {
+.vue-virt-grid-tr-group {
   // height: 40px;
   background-color: cyan;
   td {

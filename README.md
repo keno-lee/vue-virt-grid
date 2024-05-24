@@ -1,20 +1,7 @@
-# kita-grid
+# vue-virt-grid
 
-## 目标规划
+一个同时支持 合并单元格、纵向虚拟列表、横向虚拟列表 的 vue3表格组件。（仍在开发中）
 
-### 3种大的模式
+## Documentation
 
-- 合并单元格（与树形分组不兼容）
-- 树形
-- 分组
-
-table column props
-
-| 参数名 | 描述 | 类型 | 默认值 | 版本 |
-| ------ | ---- | ---- | ------ | ---- |
-| id     |      |      |        |      |
-| field  |      |      |        |      |
-| title  |      |      |        |      |
-| width  |      |      |        |      |
-| align  |      |      |        |      |
-| fixed  |      |      |        |      |
+To check out docs, visit <a href="https://keno-lee.github.io/vue-virt-grid/" target="_blank">vue-virt-grid</a>

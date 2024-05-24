@@ -1,6 +1,6 @@
 <template>
-  <div class="kita-grid-root" ref="rootRefEl">
-    <div class="kita-grid-main" ref="clientRefEl" data-id="client" :class="cls.body">
+  <div class="vue-virt-grid-root" ref="rootRefEl">
+    <div class="vue-virt-grid-main" ref="clientRefEl" data-id="client" :class="cls.body">
       <!-- height skeleton -->
       <div :style="`float:left; height: ${vlReactiveData.listTotalSize}px`"></div>
       <!-- table main -->
@@ -10,6 +10,7 @@
         cellpadding="0"
         :style="`width: ${fullWidth}px;`"
         ref="tableRefEl"
+        @mousedown="onMouseDown"
         @click="onClick"
         @dblclick="onDblclick"
         @contextmenu="onContextmenu"
@@ -19,16 +20,17 @@
           <col v-for="column in centerNormalColumns" :key="column._id" :width="column.width" />
           <col v-for="column in rightFixedColumns" :key="column._id" :width="column.width" />
         </colgroup>
+
         <thead
           ref="stickyHeaderRefEl"
           data-id="stickyHeader"
-          class="kita-grid-header"
+          class="vue-virt-grid-header"
           :style="`height: ${headerHeight}px;`"
           v-if="props.showHeader"
         >
           <GridHeader></GridHeader>
         </thead>
-        <tbody class="kita-grid-body">
+        <tbody class="vue-virt-grid-body">
           <!-- TODO 未来这里会给顶部滚动行的渲染 -->
           <!-- <tr style="position: sticky; top: 40px; z-index: 20; background-color: red;">
             <td>111</td>
@@ -59,7 +61,7 @@
         <!-- <tfoot
           ref="stickyFooterRefEl"
           data-id="stickyFooter"
-          class="kita-grid-footer"
+          class="vue-virt-grid-footer"
           style="
             position: sticky;
             bottom: 0;
@@ -75,19 +77,21 @@
         </tfoot> -->
       </table>
     </div>
-    <div class="kita-grid-mask" v-if="!list.length">
+    <div class="vue-virt-grid-mask" v-if="!list.length">
       <slot name="empty"><p>No Data</p></slot>
     </div>
   </div>
 </template>
 <script setup lang="tsx">
 import { onMounted, provide, ref, watch, computed, onBeforeUnmount } from 'vue';
-import { useVirtList } from 'vue-virt-list';
+// import { useVirtList } from 'vue-virt-list';
+import { useVirtList } from './virt';
 import { GridStore } from './store';
 import { useContentEvent } from './hooks/useEvent';
 
 import GridHeader from './main/header/GridHeader.vue';
-import BaseRow from './main/row/BaseRow.vue';
+// import BaseRow from './main/row/BaseRow.vue';
+import BaseRow from './main/row/BaseRow.tsx';
 import GroupRow from './main/row/GroupRow.vue';
 import ExpandRow from './main/row/ExpandRow.vue';
 import {
@@ -124,10 +128,14 @@ const props = withDefaults(
     showTreeLine?: boolean;
     // 是否支持框选
     selection?: boolean;
+
+    highlightHoverRow?: boolean;
+    highlightHoverCol?: boolean;
+
     // 是否高亮当前行
-    highlightCurrentRow?: boolean;
+    highlightSelectRow?: boolean;
     // 是否高亮当前列
-    highlightCurrentColumn?: boolean;
+    highlightSelectCol?: boolean;
     // 合并单元格信息
     merges?: MergeCell[];
     // 分组信息
@@ -174,7 +182,7 @@ const props = withDefaults(
     list: () => [],
 
     rowKey: 'id',
-    rowMinHeight: 30,
+    rowMinHeight: 40,
 
     showHeader: true,
     defaultExpandAll: false,
@@ -182,8 +190,10 @@ const props = withDefaults(
     stripe: false,
     showTreeLine: false,
     selection: false,
-    highlightCurrentRow: false,
-    highlightCurrentColumn: false,
+    highlightHoverRow: false,
+    highlightHoverCol: false,
+    highlightSelectRow: false,
+    highlightSelectCol: false,
     headerRowClassName: () => '',
     headerRowStyle: () => '',
     headerCellClassName: () => '',
@@ -208,8 +218,10 @@ gridStore.setUIProps('border', props.border);
 gridStore.setUIProps('stripe', props.stripe);
 gridStore.setUIProps('showTreeLine', props.showTreeLine);
 gridStore.setUIProps('selection', props.selection);
-gridStore.setUIProps('highlightCurrentRow', props.highlightCurrentRow);
-gridStore.setUIProps('highlightCurrentColumn', props.highlightCurrentColumn);
+gridStore.setUIProps('highlightHoverRow', props.highlightHoverRow);
+gridStore.setUIProps('highlightHoverCol', props.highlightHoverCol);
+gridStore.setUIProps('highlightSelectRow', props.highlightSelectRow);
+gridStore.setUIProps('highlightSelectCol', props.highlightSelectCol);
 gridStore.setUIProps('defaultExpandAll', props.defaultExpandAll);
 gridStore.setUIProps('headerRowClassName', props.headerRowClassName);
 gridStore.setUIProps('headerRowStyle', props.headerRowStyle);
@@ -225,7 +237,7 @@ gridStore.setColumns(props.columns);
 
 // 这里处理合并单元格信息
 if (props.merges) {
-  gridStore.bodyMergeMap = gridStore.mergeMapConstructor(props.merges);
+  gridStore.merges = props.merges;
 }
 
 if (props.rowKey) {
@@ -254,10 +266,14 @@ function initDataList(list: ListItem[]) {
 watch(
   () => props.groupConfig,
   (nv) => {
-    if (nv?.length) {
-      const list = gridStore.groupFoldConstructor(props.list, nv);
-      initDataList(list);
-    }
+    console.log('groupConfig', nv);
+    const list = gridStore.groupFoldConstructor(props.list, nv);
+    console.log('groupConfig', list);
+    initDataList(list);
+  },
+  {
+    immediate: true,
+    deep: true,
   },
 );
 
@@ -309,9 +325,20 @@ function calcVisibleColumns(scrollLeft: number, clientWidth: number) {
   colRenderBegin = Math.max(0, colRenderBegin - 1);
   colRenderEnd = Math.min(centerNormalColumns.length - 1, colRenderEnd + 1);
 
-  // console.log('计算结束', colRenderBegin, colRenderEnd);
-  gridStore.watchData.colRenderBegin = colRenderBegin;
-  gridStore.watchData.colRenderEnd = colRenderEnd;
+  const { watchData } = gridStore;
+  if (
+    colRenderBegin !== gridStore.watchData.originRect.xs ||
+    colRenderEnd !== gridStore.watchData.originRect.xe
+  ) {
+    console.warn('横向计算结束', colRenderBegin, colRenderEnd);
+
+    watchData.originRect.xs = colRenderBegin;
+    watchData.originRect.xe = colRenderEnd;
+
+    gridStore.calcRect(true);
+
+    // gridStore.virtualListRef?.forceUpdate();
+  }
 }
 
 function calcFixedShadow(scrollLeft: number, scrollWidth: number, clientWidth: number) {
@@ -331,9 +358,9 @@ const emitFunction = {
     // console.log('toBottom');
   },
   itemResize: (id: string, height: number) => {
-    // console.log('itemResize', id, height);
     const lastHeight = gridStore.watchData.rowHeightMap.get(String(id)) ?? props.rowMinHeight;
     gridStore.watchData.rowHeightMap.set(String(id), Math.max(lastHeight, height));
+    // console.log('maxHeight', id, height);
   },
 };
 
@@ -365,8 +392,11 @@ function getComponent(row: ListItem) {
 }
 
 const cls = computed(() => ({
-  body: [gridStore.getUIProps('border') && 'kita-grid-main--border'],
-  table: ['kita-grid-table', gridStore.gridScrollingStatus.value],
+  body: [
+    gridStore.getUIProps('border') && 'vue-virt-grid-main--border',
+    gridStore.getUIProps('highlightHoverRow') && 'vue-virt-grid-main--highlight-hover-row',
+  ],
+  table: ['vue-virt-grid-table', gridStore.gridScrollingStatus.value],
 }));
 const fullWidth = computed(() => {
   return gridStore.watchData.fullWidth;
@@ -399,4 +429,20 @@ onMounted(() => {
 onBeforeUnmount(() => {
   gridStore.eventEmitter.offAll();
 });
+
+function onMouseDown(evt: MouseEvent) {
+  const path = evt.composedPath() as HTMLElement[];
+  // console.log(evt, path);
+  // const targetTr = path.find((el) => el.tagName === 'TR');
+  const targetTd = path.find((el) => el.tagName === 'TD');
+  // console.log(targetTr, targetTr?.dataset.id);
+  // console.log(targetTd, targetTd?.dataset.rowidx, targetTd?.dataset.colidx);
+
+  if (targetTd?.dataset.rowidx !== undefined) {
+    gridStore.setSelectRow(Number(targetTd?.dataset.rowidx));
+  }
+  if (targetTd?.dataset.colidx !== undefined) {
+    gridStore.setSelectCol(Number(targetTd?.dataset.colidx));
+  }
+}
 </script>

@@ -6,7 +6,9 @@ import { CellEventEnum, RowEventEnum, HeaderEventEnum, type Column } from '@/src
  */
 const checkAndGetThInfo = (e: MouseEvent, gridStore: GridStore) => {
   const composedPath = e.composedPath();
-  const thEl = composedPath.find((el) => (el as HTMLElement).classList?.contains('kita-grid-th'));
+  const thEl = composedPath.find((el) =>
+    (el as HTMLElement).classList?.contains('vue-virt-grid-th'),
+  );
 
   if (thEl) {
     const colId = (thEl as HTMLElement).dataset.id;
@@ -25,8 +27,8 @@ const checkAndGetThInfo = (e: MouseEvent, gridStore: GridStore) => {
  */
 const checkAndGetTdInfo = (event: MouseEvent, gridStore: GridStore) => {
   const composedPath = event.composedPath();
-  const tdEl = composedPath.find(
-    (el) => (el as HTMLElement).classList?.contains('kita-grid-td'),
+  const tdEl = composedPath.find((el) =>
+    (el as HTMLElement).classList?.contains('vue-virt-grid-td'),
   ) as HTMLElement;
 
   if (tdEl) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="kita-grid-cell kita-grid-cell__title" :style="`width: ${column.width}px;`">
+  <div class="vue-virt-grid-cell vue-virt-grid-cell__title" :style="`width: ${column.width}px;`">
     <Placement
       v-for="item in row.level"
       :key="item"
@@ -66,7 +66,7 @@ const customBody = computed(() => {
 });
 </script>
 <style lang="scss">
-.kita-grid-cell__title {
+.vue-virt-grid-cell__title {
   display: flex;
   align-items: center;
   // background-color: grey;

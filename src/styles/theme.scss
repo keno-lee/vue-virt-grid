@@ -1,10 +1,10 @@
-$prefix: 'kita-grid';
+$prefix: 'vue-virt-grid';
 
 :root {
   // 表格元素层级
   --#{$prefix}-index-normal: 1;
   // 表格边框颜色
-  --#{$prefix}-border-color: #ebeef5;
+  --#{$prefix}-border-color: #e5e6eb;
   // 表格边框
   --#{$prefix}-border: 1px solid var(--#{$prefix}-border-color);
   // 表格字体颜色
@@ -20,9 +20,9 @@ $prefix: 'kita-grid';
   // 列选中背景
   --#{$prefix}-current-column-bg-color: #fff7e6;
   // 表头背景
-  --#{$prefix}-header-bg-color: #ffffff;
+  --#{$prefix}-header-bg-color: #f2f3f5;
   // 表格固定列阴影
-  --#{$prefix}-fixed-box-shadow: 0px 0px 12px rgba(0, 0, 0, .12);
+  --#{$prefix}-fixed-box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.12);
   // 表格背景颜色
   --#{$prefix}-bg-color: #ffffff;
   // 表格行背景颜色
@@ -30,9 +30,9 @@ $prefix: 'kita-grid';
   // 表格展开列背景颜色
   --#{$prefix}-expanded-cell-bg-color: #ffffff;
   // 左固定列边框样式
-  --#{$prefix}-fixed-left-column: inset 10px 0 10px -10px rgba(0, 0, 0, .15);
+  --#{$prefix}-fixed-left-column: inset 10px 0 10px -10px rgba(0, 0, 0, 0.15);
   // 右固定列边框样式
-  --#{$prefix}-fixed-right-column: inset -10px 0 10px -10px rgba(0, 0, 0, .15);
+  --#{$prefix}-fixed-right-column: inset -10px 0 10px -10px rgba(0, 0, 0, 0.15);
   // 索引列层级
   --#{$prefix}-index: var(--#{$prefix}-index-normal);
   // 区域选中边框样式
@@ -67,7 +67,7 @@ html.dark {
   // 表头背景
   --#{$prefix}-header-bg-color: #141414;
   // 表格固定列阴影
-  --#{$prefix}-fixed-box-shadow: 0px 0px 12px rgba(0, 0, 0, .72);
+  --#{$prefix}-fixed-box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.72);
   // 表格背景颜色
   --#{$prefix}-bg-color: #141414;
   // 表格行背景颜色
@@ -75,9 +75,9 @@ html.dark {
   // 表格展开列背景颜色
   --#{$prefix}-expanded-cell-bg-color: #141414;
   // 左固定列边框样式
-  --#{$prefix}-fixed-left-column: inset 10px 0 10px -10px rgba(0, 0, 0, .15);
+  --#{$prefix}-fixed-left-column: inset 10px 0 10px -10px rgba(0, 0, 0, 0.15);
   // 右固定列边框样式
-  --#{$prefix}-fixed-right-column: inset -10px 0 10px -10px rgba(0, 0, 0, .15);
+  --#{$prefix}-fixed-right-column: inset -10px 0 10px -10px rgba(0, 0, 0, 0.15);
   // 索引列层级
   --#{$prefix}-index: var(--#{$prefix}-index-normal);
   // 区域选中边框样式

@@ -11,9 +11,12 @@ import { formatColumns, type HeaderCellInfo } from './utils/column';
 import { nanoid } from 'nanoid';
 import { GridSelection } from './interaction/selection';
 import { EventEmitter } from './hooks/useEvent';
-import type { VirtListReturn } from 'vue-virt-list';
+// import type { VirtListReturn } from 'vue-virt-list';
+import type { VirtListReturn } from './virt';
 import { GridScrollZone } from './interaction/scrollZone';
 import { useTableEvent } from './hooks/useEvent/useTableEvent';
+import { isEqual, unionWith } from 'lodash-es';
+import { getMergeInfo } from './utils/merge';
 
 export type MergeInfoMap = Record<
   number,
@@ -35,8 +38,12 @@ export interface IUIProps {
   stripe: boolean;
   showTreeLine: boolean;
   selection: boolean;
-  highlightCurrentRow: boolean;
-  highlightCurrentColumn: boolean;
+
+  highlightHoverRow: boolean;
+  highlightHoverCol: boolean;
+
+  highlightSelectRow: boolean;
+  highlightSelectCol: boolean;
   defaultExpandAll: boolean;
   headerRowClassName: (data: { row: Column[]; rowIndex: number }) => string;
   headerRowStyle: (data: { row: Column[]; rowIndex: number }) => string;
@@ -90,16 +97,17 @@ export class GridStore {
   watchData = reactive({
     // 强制渲染
     renderKey: 0,
-    // 列渲染起始
-    colRenderBegin: 0,
-    // 列渲染结束
-    colRenderEnd: 0,
     // TODO 可能考虑拿出去做非响应式
     rowHeightMap: new Map(),
     // 父子显示的映射
     foldMap: {} as Record<string, boolean>,
     // 展开行显示的映射
     expandMap: {} as Record<string, boolean>,
+
+    // 多数
+    checkboxRows: new Set() as Set<ListItem>,
+    // 唯一
+    radioRow: null as null | ListItem,
 
     // FIXME： 分组不需要这个，要重新写分组逻辑
     // 配置
@@ -110,6 +118,21 @@ export class GridStore {
       // headerWidth: 100,
     },
     fullWidth: 0,
+
+    // 可视区域
+    originRect: {
+      ys: 0,
+      ye: 0,
+      xs: 0,
+      xe: 0,
+    },
+    // 渲染区域
+    renderRect: {
+      ys: 0,
+      ye: 0,
+      xs: 0,
+      xe: 0,
+    },
   });
 
   rowKey: string | number = 'id';
@@ -117,14 +140,21 @@ export class GridStore {
   // 非响应式
   virtualListProps = shallowReactive({
     list: [] as ListItem[],
-    minSize: 30,
+    minSize: 40,
     itemKey: this.rowKey,
     // buffer: 4,
     renderControl: (begin: number, end: number) => {
-      // console.log('renderControl', begin, end, this.bodyMergeMap?.[begin]);
+      // console.error('renderControl inview', begin, end);
+      this.watchData.originRect.ys = begin;
+      this.watchData.originRect.ye = end;
+
+      const { ys, ye } = this.calcRect();
+
+      // console.error('renderControl render', ys, ye);
+
       return {
-        begin: this.bodyMergeMap?.[begin]?.$begin ?? begin,
-        end: this.bodyMergeMap?.[end]?.$end ?? end,
+        begin: ys ?? begin,
+        end: ye ?? end,
       };
     },
   });
@@ -134,8 +164,12 @@ export class GridStore {
     stripe: false,
     showTreeLine: false,
     selection: false,
-    highlightCurrentRow: false,
-    highlightCurrentColumn: false,
+
+    highlightHoverRow: false,
+    highlightHoverCol: false,
+
+    highlightSelectRow: false,
+    highlightSelectCol: false,
     defaultExpandAll: false,
     headerRowClassName: () => '',
     headerRowStyle: () => '',
@@ -152,6 +186,9 @@ export class GridStore {
     selectCellBorderMap: {},
     selectCellClassMap: {},
   });
+
+  merges = [] as MergeCell[];
+  tempMerges = [] as MergeCell[];
 
   // 原始列数据（带 _id），一般不直接用
   private originColumns = [] as ColumnItem[];
@@ -172,16 +209,17 @@ export class GridStore {
   // 记一下原始的list
   originList = [] as ListItem[];
 
-  // 表身合并信息
-  bodyMergeMap = {} as MergeInfoMap;
+  // TODO 2个要删除
+  tempMergeMap = {} as any;
+  bodyMergeMap = {} as any;
 
   headerCellInfo: HeaderCellInfo = {};
 
   gridSelection = new GridSelection(this);
   gridScrollZone = new GridScrollZone(this);
 
-  currentRowId = ref('');
-  currentColumnId = ref('');
+  selectRowId = ref('');
+  selectColId = ref('');
 
   gridScrollingStatus = ref('is-scrolling-none');
 
@@ -192,6 +230,347 @@ export class GridStore {
 
   // 用于内部事件的触发
   eventEmitter = new EventEmitter();
+
+  calcRect(horizontal: boolean): any {
+    // console.time('calcRect');
+    const topMerges: any = [];
+    const leftMerges: any = [];
+    const rightMerges: any = [];
+    const bottomMerges: any = [];
+    // 计算出实际渲染的区域（补全rect）
+    const oys = this.watchData.originRect.ys;
+    const oye = this.watchData.originRect.ye;
+    const oxs = this.watchData.originRect.xs;
+    const oxe = this.watchData.originRect.xe;
+
+    let rys = this.watchData.originRect.ys;
+    let rye = this.watchData.originRect.ye;
+    let rxs = this.watchData.originRect.xs;
+    let rxe = this.watchData.originRect.xe;
+
+    for (let y = oys; y <= oye; y++) {
+      for (let x = oxs; x <= oxe; x++) {
+        // 如果是第一行，那么可以算出rys
+        if (y === oys) {
+          const mergeInfo = getMergeInfo(this.merges, y, x);
+          // console.warn('第一行', y, x, mergeInfo);
+          if (mergeInfo) {
+            const { rowIndex, colIndex, colspan } = mergeInfo;
+            rys = Math.min(rys, rowIndex);
+            rxs = Math.min(rxs, colIndex);
+            rxe = Math.max(rxe, colIndex + colspan - 1);
+            // 只有被上面的行合并的单元格才需要加进来
+            if (y > rowIndex) {
+              topMerges.push(mergeInfo);
+            }
+          }
+        }
+
+        // 左边列，不包含第一行和最后一行
+        if (x === oxs) {
+          const mergeInfo = getMergeInfo(this.merges, y, x);
+          // console.warn('左边列', y, x, mergeInfo);
+          if (mergeInfo) {
+            const { colIndex } = mergeInfo;
+            rxs = Math.min(rxs, colIndex);
+            // 只有被左边的列合并的单元格才需要加进来
+            if (x > colIndex) {
+              leftMerges.push(mergeInfo);
+            }
+          }
+        }
+
+        // 右边列，不包含第一行和最后一行
+        if (x === oxe) {
+          const mergeInfo = getMergeInfo(this.merges, y, x);
+          // console.warn('右边列', y, x, mergeInfo);
+          if (mergeInfo) {
+            const { colIndex, colspan } = mergeInfo;
+            rxe = Math.max(rxe, colIndex + colspan - 1);
+            // 只要是有合并信息的都加进去
+            rightMerges.push(mergeInfo);
+          }
+        }
+
+        // 如果是最后一行，那么可以算出rye
+        if (y === oye) {
+          const mergeInfo = getMergeInfo(this.merges, y, x);
+          if (mergeInfo) {
+            // 只要是有合并信息的都加进去
+            const { rowIndex, colIndex, rowspan, colspan } = mergeInfo;
+            // console.warn('最后一行', y, x, mergeInfo);
+            rye = Math.max(rye, rowIndex + rowspan - 1);
+            // rxs = Math.min(rxs, colIndex);
+            // rxe = Math.max(rxe, colIndex + colspan - 1);
+            bottomMerges.push(mergeInfo);
+          }
+        }
+      }
+    }
+
+    this.watchData.renderRect.ys = rys;
+    this.watchData.renderRect.ye = rye;
+    this.watchData.renderRect.xs = rxs;
+    this.watchData.renderRect.xe = rxe;
+
+    // console.log('原始区域', this.watchData.originRect);
+    // console.log('渲染区域', this.watchData.renderRect);
+
+    // console.warn('topMerges', topMerges);
+    // console.warn('leftMerges', leftMerges);
+    // console.warn('rightMerges', rightMerges);
+    // console.warn('bottomMerges', bottomMerges);
+    // 顶部
+    const placeCells2top: any[] = [];
+    if (oys > rys) {
+      const unionMerges = unionWith(topMerges, isEqual);
+      // console.warn('unionTopMerges', unionMerges);
+      // 顶部占位单元格
+      placeCells2top.push({
+        // 应该从渲染的ys开始
+        rowIndex: rys,
+        colIndex: rxs,
+        rowspan: oys - rys,
+        colspan: rxe - rxs + 1,
+      });
+      // console.log('top原始', placeCells2top[0]);
+      // 遍历信息，拆分占位单元格
+      unionMerges.forEach((merge) => {
+        const { rowIndex, colIndex, colspan } = merge;
+        // 拿最后一个单元格拆分
+        const last = placeCells2top.pop();
+        const {
+          rowIndex: rowIndexLast,
+          colIndex: colIndexLast,
+          rowspan: rowspanLast,
+          colspan: colspanLast,
+        } = last;
+        // 左边可能也不存在
+        if (colIndex > colIndexLast) {
+          placeCells2top.push({
+            rowIndex: rowIndexLast,
+            colIndex: colIndexLast,
+            rowspan: rowspanLast,
+            colspan: colIndex - colIndexLast,
+          });
+        }
+        // 中间，中间可能有可能无
+        if (rowIndex > rowIndexLast) {
+          placeCells2top.push({
+            rowIndex: rowIndexLast,
+            colIndex: colIndex,
+            rowspan: rowIndex - rowIndexLast,
+            colspan: colspan,
+          });
+        }
+        // 右边可能也不存在
+        if (colIndex + colspan - 1 < colIndexLast + colspanLast - 1) {
+          placeCells2top.push({
+            rowIndex: rowIndexLast,
+            colIndex: colIndex + colspan,
+            rowspan: rowspanLast,
+            colspan: colIndexLast + colspanLast - colIndex - colspan,
+          });
+        }
+      });
+      console.warn('placeCells2top', placeCells2top);
+    }
+
+    // 左边
+    const placeCells2Left: any[] = [];
+    if (oxs > rxs) {
+      const unionMerges = unionWith(leftMerges, isEqual);
+      // console.warn('unionLeftMerges', unionMerges);
+
+      placeCells2Left.push({
+        rowIndex: oys,
+        colIndex: rxs,
+        rowspan: oye - oys + 1,
+        colspan: oxs - rxs,
+      });
+      // console.log('left原始', placeCells2Left[0]);
+
+      // 遍历信息，拆分占位单元格
+      unionMerges.forEach((merge) => {
+        const { rowIndex, colIndex, rowspan } = merge;
+        // 拿最后一个单元格拆分
+        const last = placeCells2Left.pop();
+        const {
+          rowIndex: rowIndexLast,
+          colIndex: colIndexLast,
+          colspan: colspanLast,
+          rowspan: rowspanLast,
+        } = last;
+
+        // 上边可能不存在
+        if (rowIndex > rowIndexLast) {
+          placeCells2Left.push({
+            rowIndex: rowIndexLast,
+            colIndex: colIndexLast,
+            rowspan: rowIndex - rowIndexLast,
+            colspan: colspanLast,
+          });
+        }
+        // 中间，中间可能有可能无
+        if (colIndex > colIndexLast) {
+          placeCells2Left.push({
+            rowIndex: rowIndex,
+            colIndex: colIndexLast,
+            rowspan: rowspan,
+            colspan: colIndex - colIndexLast,
+          });
+        }
+        // 下边可能也不存在
+        if (rowIndex + rowspan - 1 < rowIndexLast + rowspanLast - 1) {
+          placeCells2Left.push({
+            rowIndex: rowIndex + rowspan,
+            colIndex: colIndexLast,
+            rowspan: rowIndexLast + rowspanLast - rowIndex - rowspan,
+            colspan: colspanLast,
+          });
+        }
+      });
+
+      console.warn('placeCells2Left', placeCells2Left);
+    }
+
+    // 右边 这里不能用最后一个数作为合并的范围，因为会造成大量的合并单元格信息。不如每行最后一个占位单元格数据量更小
+    const placeCells2Right: any[] = [];
+    if (oxe < rxe) {
+      const unionMerges = unionWith(rightMerges, isEqual);
+      // console.warn('unionRightMerges', unionMerges);
+      placeCells2Right.push({
+        rowIndex: oys,
+        colIndex: oxe + 1,
+        rowspan: oye - oys + 1,
+        colspan: rxe - oxe,
+      });
+      // console.log('right原始', placeCells2Right[0]);
+
+      // 遍历信息，拆分占位单元格
+      unionMerges.forEach((merge) => {
+        const { rowIndex, colIndex, rowspan, colspan } = merge;
+        // 拿最后一个单元格拆分
+        const last = placeCells2Right.pop();
+        const {
+          rowIndex: rowIndexLast,
+          colIndex: colIndexLast,
+          colspan: colspanLast,
+          rowspan: rowspanLast,
+        } = last;
+        // 上边可能不存在
+        if (rowIndex > rowIndexLast) {
+          placeCells2Right.push({
+            rowIndex: rowIndexLast,
+            colIndex: colIndexLast,
+            rowspan: rowIndex - rowIndexLast,
+            colspan: colspanLast,
+          });
+        }
+        // 中间，中间可能有可能无
+        if (colIndex + colspan - 1 < colIndexLast + colspanLast - 1) {
+          placeCells2Right.push({
+            rowIndex: rowIndex,
+            colIndex: colIndex + colspan,
+            rowspan: rowspan,
+            colspan: colIndexLast + colspanLast - colIndex - colspan,
+          });
+        }
+        // 下边可能也不存在
+        if (rowIndex + rowspan - 1 < rowIndexLast + rowspanLast - 1) {
+          placeCells2Right.push({
+            rowIndex: rowIndex + rowspan,
+            colIndex: colIndexLast,
+            rowspan: rowIndexLast + rowspanLast - rowIndex - rowspan,
+            colspan: colspanLast,
+          });
+        }
+      });
+
+      // console.warn('placeCells2Right', placeCells2Right);
+    }
+
+    // 底边
+    const placeCells2Bottom: any[] = [];
+    if (oye < rye) {
+      const unionMerges = unionWith(bottomMerges, isEqual);
+      // console.warn('unionBottomMerges', unionMerges);
+      placeCells2Bottom.push({
+        rowIndex: oye + 1,
+        colIndex: rxs,
+        rowspan: rye - oye,
+        colspan: rxe - rxs + 1,
+      });
+      console.log('placeCells2Bottom', placeCells2Bottom[0]);
+
+      // 遍历信息，拆分占位单元格
+      unionMerges.forEach((merge) => {
+        const { rowIndex, colIndex, rowspan, colspan } = merge;
+        // 拿最后一个单元格拆分
+        const last = placeCells2Bottom.pop();
+        const {
+          rowIndex: rowIndexLast,
+          colIndex: colIndexLast,
+          colspan: colspanLast,
+          rowspan: rowspanLast,
+        } = last;
+        // 左边可能也不存在
+        if (colIndex > colIndexLast) {
+          placeCells2Bottom.push({
+            rowIndex: rowIndexLast,
+            colIndex: colIndexLast,
+            rowspan: rowspanLast,
+            colspan: colIndex - colIndexLast,
+          });
+        }
+        // 中间，中间可能有可能无
+        if (rowIndex + rowspan - 1 < rowIndexLast) {
+          placeCells2Bottom.push({
+            rowIndex: rowIndexLast,
+            colIndex: colIndex,
+            rowspan: rowIndexLast + colspanLast - rowIndex - colspan,
+            colspan: colspan,
+          });
+        }
+        // 右边可能也不存在
+        if (colIndex + colspan - 1 < colIndexLast + colspanLast - 1) {
+          placeCells2Bottom.push({
+            rowIndex: rowIndexLast,
+            colIndex: colIndex + colspan,
+            rowspan: rowspanLast,
+            colspan: colIndexLast + colspanLast - colIndex - colspan,
+          });
+        }
+      });
+
+      // console.warn('placeCells2Bottom', placeCells2Bottom);
+    }
+
+    this.tempMerges = [
+      ...placeCells2top,
+      ...placeCells2Left,
+      ...placeCells2Right,
+      ...placeCells2Bottom,
+    ];
+
+    console.log('tempMerges', this.tempMerges);
+
+    console.warn(`rys: ${rys} rye: ${rye} rxs: ${rxs} rxe: ${rxe}`);
+    // 生成占位单元格信息，用于渲染优化
+
+    // console.timeEnd('calcRect');
+
+    if (horizontal) {
+      // 手动调用render
+      this.virtualListRef?.manualRender(rys, rye);
+    }
+    this.forceUpdate();
+
+    return {
+      ys: rys,
+      ye: rye,
+    };
+  }
 
   constructor() {
     this.gridSelection.on(this.handleSelectionChange);
@@ -280,6 +659,30 @@ export class GridStore {
 
   setTableRootEl(el: HTMLElement) {
     this.tableRootEl = el;
+  }
+
+  getCheckboxRows() {
+    return this.watchData.checkboxRows;
+  }
+
+  addCheckboxRows(row: ListItem) {
+    this.watchData.checkboxRows.add(row);
+  }
+
+  deleteCheckboxRows(row: ListItem) {
+    this.watchData.checkboxRows.delete(row);
+  }
+
+  addAllCheckboxRows() {
+    this.watchData.checkboxRows = new Set(this.virtualListProps.list);
+  }
+
+  clearCheckboxRows() {
+    this.watchData.checkboxRows.clear();
+  }
+
+  addRadioRow(row: ListItem) {
+    this.watchData.radioRow = row;
   }
 
   // setMergeMethods(mergeMethods: any) {
@@ -419,58 +822,10 @@ export class GridStore {
     return this.mergeMapConstructor(res);
   }
 
-  mergeMapConstructor(cellList: MergeCell[]) {
-    type MergeInfo = {
-      $begin: number;
-      $end: number;
-      rowspan?: number;
-      colspan?: number;
-      mergeBy?: [number, number];
-    };
-    const mergeMap: Record<number, MergeInfo & Record<number, MergeInfo>> = {};
-    cellList.forEach((cell) => {
-      const { rowIndex, colIndex, rowspan, colspan } = cell;
-      if (mergeMap[rowIndex]) {
-        mergeMap[rowIndex].$begin = Math.min(mergeMap[rowIndex].$begin, rowIndex);
-        mergeMap[rowIndex].$end = Math.max(mergeMap[rowIndex].$end, rowIndex + rowspan - 1);
-      } else {
-        mergeMap[rowIndex] = {
-          $begin: rowIndex,
-          $end: rowIndex + rowspan - 1,
-        };
-      }
-
-      for (let i = rowIndex; i < rowIndex + rowspan; i += 1) {
-        for (let j = colIndex; j < colIndex + colspan; j += 1) {
-          if (!mergeMap[i]) {
-            mergeMap[i] = {
-              $begin: rowIndex,
-              $end: rowIndex + rowspan - 1,
-            };
-          } else {
-            mergeMap[i].$begin = Math.min(mergeMap[i].$begin, rowIndex);
-            mergeMap[i].$end = Math.max(mergeMap[i].$end, rowIndex + rowspan - 1);
-          }
-          mergeMap[i][j] = {
-            $begin: colIndex,
-            $end: colIndex + colspan - 1,
-            mergeBy: [rowIndex, colIndex],
-          };
-        }
-      }
-
-      mergeMap[rowIndex][colIndex] = {
-        $begin: colIndex,
-        $end: colIndex + colspan - 1,
-        rowspan,
-        colspan,
-      };
-    });
-    // console.log('mergeMap', mergeMap);
-    return mergeMap;
-  }
+  mergeMapConstructor(cellList: MergeCell[]) {}
 
   groupFoldConstructor(list: ListItem[], conditions: { columnId: string; sort: 'desc' | 'asc' }[]) {
+    console.log('groupFoldConstructor', list.length, conditions);
     return this.constructGroup(list, 0, conditions);
   }
 
@@ -803,7 +1158,7 @@ export class GridStore {
     const type = column.type;
 
     if (type === ColumnType.Expand || type === ColumnType.Index || type === ColumnType.Checkbox) {
-      return 'kita-grid-cell--unselectable';
+      return 'vue-virt-grid-cell--unselectable';
     }
 
     const id = `${rowIndex}-${colIndex}`;
@@ -815,23 +1170,24 @@ export class GridStore {
     this.gridScrollZone.init(el);
   }
 
-  getCurrentRow() {
-    return this.currentRowId.value;
+  getSelectRow() {
+    return this.selectRowId.value;
   }
 
-  setCurrentRow(v: string) {
-    if (this.getUIProps('highlightCurrentRow')) {
-      this.currentRowId.value = v;
+  setSelectRow(rowIndex: number) {
+    // TODO 后面看看是不是要这个
+    if (this.getUIProps('highlightSelectRow')) {
+      this.selectRowId.value = this.virtualListProps.list[rowIndex].id;
     }
   }
 
-  getCurrentColumn() {
-    return this.currentColumnId.value;
+  getSelectCol() {
+    return this.selectColId.value;
   }
 
-  setCurrentColumn(v: string) {
-    if (this.getUIProps('highlightCurrentColumn')) {
-      this.currentColumnId.value = v;
+  setSelectCol(colIndex: number) {
+    if (this.getUIProps('highlightSelectCol')) {
+      this.selectColId.value = this.flattedColumns[colIndex]._id;
     }
   }
 

@@ -73,25 +73,25 @@ const {
 
 const cls = {
   leftFixed: (column: ColumnItem, index: number) => [
-    'kita-grid-th',
+    'vue-virt-grid-th',
     'is-fixed',
     'is-fixed--left',
     index === leftFixedHeaderColumns[props.headerRowIndex].length - 1 && 'is-last-column',
     getCellClass(column),
     column.className,
   ],
-  leftPadding: () => ['kita-grid-th'],
-  main: (column: ColumnItem) => ['kita-grid-th', getCellClass(column), column.className],
-  rightPadding: () => ['kita-grid-th'],
+  leftPadding: () => ['vue-virt-grid-th'],
+  main: (column: ColumnItem) => ['vue-virt-grid-th', getCellClass(column), column.className],
+  rightPadding: () => ['vue-virt-grid-th'],
   rightFixed: (column: ColumnItem, index: number) => [
-    'kita-grid-th',
+    'vue-virt-grid-th',
     'is-fixed',
     'is-fixed--right',
     index === 0 && 'is-first-column',
     getCellClass(column),
     column.className,
   ],
-  row: () => ['kita-grid-tr', getRowClass()],
+  row: () => ['vue-virt-grid-tr', getRowClass()],
 };
 
 const props = withDefaults(
@@ -206,6 +206,8 @@ function getRenderCell(column: ColumnItem) {
       return IndexHeaderCell;
     case ColumnType.Checkbox:
       return CheckboxHeaderCell;
+    case ColumnType.Radio:
+      return TextHeaderCell;
     // case ColumnType.orderCheckbox:
     //   return OrderHeaderCell;
     default:

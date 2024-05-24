@@ -1,5 +1,8 @@
 <template>
-  <div class="kita-grid-cell kita-grid-cell__expand" @click="gridStore.toggleExpand(row.id)">
+  <div
+    class="vue-virt-grid-cell vue-virt-grid-cell__expand"
+    @click="gridStore.toggleExpand(row.id)"
+  >
     <div :class="['row-expand-icon', watchData.expandMap[row.id] && 'row-expand-icon--expand']">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -24,6 +27,7 @@ import type { ListItem, ColumnItem } from '@/src/type';
 const gridStore = inject('gridStore') as GridStore;
 
 const { watchData } = gridStore;
+
 defineProps<{
   rowIndex: number;
   row: ListItem;

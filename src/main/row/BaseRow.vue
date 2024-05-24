@@ -1,5 +1,5 @@
 <template>
-  <tr ref="itemRefEl" :class="cls.row()" :style="getRowStyle()" @mousedown="handleCurrentRowClick">
+  <tr ref="itemRefEl" :class="cls.row()" :style="getRowStyle()">
     <!-- 左侧固定列 -->
     <template v-for="(column, index) in mainRenderInfo.leftColumns" :key="column.field">
       <td
@@ -77,14 +77,15 @@
 <script setup lang="ts">
 import { inject, computed } from 'vue';
 import type { GridStore } from '@/src/store';
-import { useObserverItem } from 'vue-virt-list';
+import { ColumnType, type ColumnItem, type ListItem } from '@/src/type';
+// import { useObserverItem } from 'vue-virt-list';
+import { useObserverItem } from '../../virt';
 import TitleCell from './cell/TitleCell.vue';
 import TextCell from './cell/TextCell.vue';
 import { useRenderColumns } from '@/src/hooks/useRenderColumns';
 import IndexCell from './cell/IndexCell.vue';
 import CheckboxCell from './cell/CheckboxCell.vue';
-
-import { ColumnType, type ColumnItem, type ListItem } from '@/src/type';
+import RadioCell from './cell/RadioCell.vue';
 import ExpandCell from './cell/ExpandCell.vue';
 
 const gridStore = inject('gridStore') as GridStore;
@@ -102,43 +103,43 @@ const props = withDefaults(
   },
 );
 
-const currentRowId = computed(() => gridStore.getCurrentRow());
-const currentColumnId = computed(() => gridStore.getCurrentColumn());
+const selectRowId = computed(() => gridStore.getSelectRow());
+const selectColId = computed(() => gridStore.getSelectCol());
 
 const cls = {
   leftFixed: (column: ColumnItem, index: number) => [
-    'kita-grid-td',
+    'vue-virt-grid-td',
     'is-fixed',
     'is-fixed--left',
     index === mainRenderInfo.value.leftColumns.length - 1 && 'is-last-column',
-    column._id === currentColumnId.value && 'current-column',
+    column._id === selectColId.value && 'current-column',
     gridStore.getSelectionClass(props.rowIndex, column),
     getCellClass(column),
     column.className,
   ],
-  leftPadding: () => ['kita-grid-td'],
+  leftPadding: () => ['vue-virt-grid-td'],
   main: (column: ColumnItem) => [
-    'kita-grid-td',
-    column._id === currentColumnId.value && 'current-column',
+    'vue-virt-grid-td',
+    column._id === selectColId.value && 'current-column',
     gridStore.getSelectionClass(props.rowIndex, column),
     getCellClass(column),
     column.className,
   ],
-  rightPadding: () => ['kita-grid-td'],
+  rightPadding: () => ['vue-virt-grid-td'],
   rightFixed: (column: ColumnItem, index: number) => [
-    'kita-grid-td',
+    'vue-virt-grid-td',
     'is-fixed',
     'is-fixed--right',
     index === 0 && 'is-first-column',
-    column._id === currentColumnId.value && 'current-column',
+    column._id === selectColId.value && 'current-column',
     gridStore.getSelectionClass(props.rowIndex, column),
     getCellClass(column),
     column.className,
   ],
   row: () => [
-    'kita-grid-tr',
-    gridStore.getUIProps('stripe') && props.rowIndex % 2 && 'kita-grid-tr--striped',
-    props.row.id === currentRowId.value && 'current-row',
+    'vue-virt-grid-tr',
+    gridStore.getUIProps('stripe') && props.rowIndex % 2 && 'vue-virt-grid-tr--striped',
+    props.row.id === selectRowId.value && 'current-row',
     getRowClass(),
   ],
 };
@@ -201,6 +202,8 @@ function getRenderCell(column: ColumnItem) {
       return TitleCell;
     case ColumnType.Checkbox:
       return CheckboxCell;
+    case ColumnType.Radio:
+      return RadioCell;
     case ColumnType.Expand:
       return ExpandCell;
     // case ColumnType.orderCheckbox:
@@ -209,15 +212,5 @@ function getRenderCell(column: ColumnItem) {
       if (column.bodyRender) return column?.bodyRender?.(column, props.row);
       return TextCell;
   }
-}
-
-function handleCurrentRowClick() {
-  gridStore.setCurrentRow(props.row.id);
-}
-
-function handleCurrentColumnClick(row: ListItem, column: ColumnItem, e: MouseEvent) {
-  // 判断是鼠标左键，才继续
-  if (e.button !== 0) return;
-  gridStore.setCurrentColumn(column._id);
 }
 </script>
