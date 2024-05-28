@@ -78,8 +78,7 @@
 import { inject, computed } from 'vue';
 import type { GridStore } from '@/src/store';
 import { ColumnType, type ColumnItem, type ListItem } from '@/src/type';
-// import { useObserverItem } from 'vue-virt-list';
-import { useObserverItem } from '../../virt';
+import { useObserverItem } from 'vue-virt-list';
 import TitleCell from './cell/TitleCell.vue';
 import TextCell from './cell/TextCell.vue';
 import { useRenderColumns } from '@/src/hooks/useRenderColumns';

@@ -6,17 +6,16 @@ import {
   type MergeCell,
   type SelectedCells,
   type ColumnItem,
-} from './type';
-import { formatColumns, type HeaderCellInfo } from './utils/column';
+} from '@/src/type';
+import { formatColumns, type HeaderCellInfo } from '@/src/utils/column';
 import { nanoid } from 'nanoid';
-import { GridSelection } from './interaction/selection';
-import { EventEmitter } from './hooks/useEvent';
-// import type { VirtListReturn } from 'vue-virt-list';
-import type { VirtListReturn } from './virt';
-import { GridScrollZone } from './interaction/scrollZone';
-import { useTableEvent } from './hooks/useEvent/useTableEvent';
+import { GridSelection } from '@/src/interaction/selection';
+import { EventEmitter } from '@/src/hooks/useEvent';
+import type { VirtListReturn } from 'vue-virt-list';
+import { GridScrollZone } from '@/src/interaction/scrollZone';
+import { useTableEvent } from '@/src/hooks/useEvent/useTableEvent';
 import { isEqual, unionWith } from 'lodash-es';
-import { getMergeInfo } from './utils/merge';
+import { getMergeInfo } from '@/src/utils/merge';
 
 export type MergeInfoMap = Record<
   number,
@@ -231,7 +230,7 @@ export class GridStore {
   // 用于内部事件的触发
   eventEmitter = new EventEmitter();
 
-  calcRect(horizontal: boolean): any {
+  calcRect(horizontal?: boolean): any {
     // console.time('calcRect');
     const topMerges: any = [];
     const leftMerges: any = [];
@@ -373,7 +372,7 @@ export class GridStore {
           });
         }
       });
-      console.warn('placeCells2top', placeCells2top);
+      // console.warn('placeCells2top', placeCells2top);
     }
 
     // 左边
@@ -431,7 +430,7 @@ export class GridStore {
         }
       });
 
-      console.warn('placeCells2Left', placeCells2Left);
+      // console.warn('placeCells2Left', placeCells2Left);
     }
 
     // 右边 这里不能用最后一个数作为合并的范围，因为会造成大量的合并单元格信息。不如每行最后一个占位单元格数据量更小
@@ -501,7 +500,7 @@ export class GridStore {
         rowspan: rye - oye,
         colspan: rxe - rxs + 1,
       });
-      console.log('placeCells2Bottom', placeCells2Bottom[0]);
+      // console.log('placeCells2Bottom', placeCells2Bottom[0]);
 
       // 遍历信息，拆分占位单元格
       unionMerges.forEach((merge) => {
@@ -553,9 +552,9 @@ export class GridStore {
       ...placeCells2Bottom,
     ];
 
-    console.log('tempMerges', this.tempMerges);
+    // console.log('tempMerges', this.tempMerges);
 
-    console.warn(`rys: ${rys} rye: ${rye} rxs: ${rxs} rxe: ${rxe}`);
+    // console.warn(`rys: ${rys} rye: ${rye} rxs: ${rxs} rxe: ${rxe}`);
     // 生成占位单元格信息，用于渲染优化
 
     // console.timeEnd('calcRect');

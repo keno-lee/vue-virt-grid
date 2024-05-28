@@ -1,10 +1,10 @@
 import './styles/index.scss';
 
-import Grid from './Grid.vue';
+import Grid from './grid/Grid.vue';
 
-export { default as GridTable } from './table/GridTable.vue';
-export { default as GridTableColumn } from './table/GridTableColumn.vue';
+export { default as GridTable } from './template/GridTable.vue';
+export { default as GridTableColumn } from './template/GridTableColumn.vue';
 
 export { Grid };
 
-export * from './type';
+export * from '@/src/type';

@@ -7,7 +7,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, Fragment, render, type Component, type VNode, getCurrentInstance } from 'vue';
-import Grid from '../Grid.vue';
+import Grid from '../grid/Grid.vue';
 import {
   type CellEmits,
   type Column,
@@ -16,7 +16,7 @@ import {
   type MergeCell,
   type RowEmits,
   type TableEmits,
-} from '../type';
+} from '@/src/type';
 
 const props = defineProps<{
   list: ListItem[];

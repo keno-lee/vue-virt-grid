@@ -5,7 +5,7 @@ import {
   type MergeCell,
   type SelectedCells,
   type ColumnItem,
-} from '../type';
+} from '@/src/type';
 
 export function isInMergeCell(mergeInfo: MergeCell, rowIndex: number, colIndex: number) {
   return (

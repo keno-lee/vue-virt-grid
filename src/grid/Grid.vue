@@ -84,16 +84,15 @@
 </template>
 <script setup lang="tsx">
 import { onMounted, provide, ref, watch, computed, onBeforeUnmount } from 'vue';
-// import { useVirtList } from 'vue-virt-list';
-import { useVirtList } from './virt';
-import { GridStore } from './store';
-import { useContentEvent } from './hooks/useEvent';
+import { useVirtList } from 'vue-virt-list';
+import { GridStore } from '@/src/store';
+import { useContentEvent } from '@/src/hooks/useEvent';
 
-import GridHeader from './main/header/GridHeader.vue';
-// import BaseRow from './main/row/BaseRow.vue';
-import BaseRow from './main/row/BaseRow.tsx';
-import GroupRow from './main/row/GroupRow.vue';
-import ExpandRow from './main/row/ExpandRow.vue';
+import GridHeader from '@/src/grid-header/GridHeader.vue';
+// import BaseRow from '@/src/grid-row/BaseRow.vue';
+import BaseRow from '@/src/grid-row/BaseRow';
+import GroupRow from '@/src/grid-row/GroupRow.vue';
+import ExpandRow from '@/src/grid-row/ExpandRow.vue';
 import {
   RowEventEnum,
   type CellEmits,
@@ -106,7 +105,7 @@ import {
   type MergeCell,
   TableEventEnum,
   type Column,
-} from './type';
+} from '@/src/type';
 
 const emits = defineEmits<CellEmits & RowEmits & HeaderEmits & TableEmits>();
 

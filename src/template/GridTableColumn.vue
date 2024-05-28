@@ -3,7 +3,7 @@
 </template>
 <script lang="ts" setup>
 import type { VNode } from 'vue';
-import type { Column, ListItem } from '../type';
+import type { Column, ListItem } from '@/src/type';
 
 defineProps<Column>();
 

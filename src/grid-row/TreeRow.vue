@@ -18,11 +18,10 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 import type { GridStore } from '@/src/store';
-// import { useObserverItem } from 'vue-virt-list';
-import { useObserverItem } from '../../virt';
+import { useObserverItem } from 'vue-virt-list';
 import { type ListItem } from '@/src/type';
 
-import Placement from '../Placement.vue';
+import Placement from './Placement.vue';
 
 const gridStore = inject('gridStore') as GridStore;
 const { config } = gridStore.watchData;

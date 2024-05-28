@@ -10,8 +10,7 @@
 <script setup lang="ts">
 import { inject, computed } from 'vue';
 import type { GridStore } from '@/src/store';
-// import { useObserverItem } from 'vue-virt-list';
-import { useObserverItem } from '../../virt';
+import { useObserverItem } from 'vue-virt-list';
 import { type ListItem } from '@/src/type';
 
 const gridStore = inject('gridStore') as GridStore;

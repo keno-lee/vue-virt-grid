@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import type { Column, ColumnItem } from '../type';
+import type { Column, ColumnItem } from '@/src/type';
 
 export interface FormatColumns {
   headerCellInfo: HeaderCellInfo;

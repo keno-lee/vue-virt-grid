@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { inject, computed } from 'vue';
 import type { GridStore } from '@/src/store';
-import Placement from '@/src/main/Placement.vue';
+import Placement from '../Placement.vue';
 import type { ListItem, ColumnItem } from '@/src/type';
 
 const gridStore = inject('gridStore') as GridStore;
