@@ -3,12 +3,12 @@ import type { GridStore } from '@/src/store';
 import { ColumnType, type ColumnItem, type ListItem } from '@/src/type';
 import { getMergeInfo } from '@/src/utils/merge';
 import { useObserverItem } from 'vue-virt-list';
-import TitleCell from './cell/TitleCell.vue';
-import TextCell from './cell/TextCell.vue';
-import IndexCell from './cell/IndexCell.vue';
-import CheckboxCell from './cell/CheckboxCell.vue';
-import RadioCell from './cell/RadioCell.vue';
-import ExpandCell from './cell/ExpandCell.vue';
+import TitleCell from '@/src/grid-cell/TitleCell.vue';
+import TextCell from '@/src/grid-cell/TextCell.vue';
+import IndexCell from '@/src/grid-cell/IndexCell.vue';
+import CheckboxCell from '@/src/grid-cell/CheckboxCell.vue';
+import RadioCell from '@/src/grid-cell/RadioCell.vue';
+import ExpandCell from '@/src/grid-cell/ExpandCell.vue';
 
 export default defineComponent({
   name: 'Row',
@@ -54,7 +54,7 @@ export default defineComponent({
     }: {
       row: ListItem;
       rowIndex: number;
-      column: any;
+      column: ColumnItem;
     }) => {
       switch (column.type) {
         case ColumnType.Index:
@@ -69,7 +69,7 @@ export default defineComponent({
           return <ExpandCell rowIndex={rowIndex} row={row} column={column}></ExpandCell>;
         default:
           if (column.bodyRender) return column?.bodyRender?.(column, props.row);
-          return TextCell;
+          return <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell>;
       }
     };
 
@@ -179,6 +179,7 @@ export default defineComponent({
           <td
             // key={`${watchData.renderKey}-${rowIndex}-lp`}
             data-colidx={column.colIndex}
+            data-rowidx={rowIndex}
             class={cls.leftFixed(column, colIndex)}
             style={`text-align: ${column.align}; left: ${
               headerCellInfo[column._id].left
@@ -199,6 +200,7 @@ export default defineComponent({
         <td
           key={`${watchData.renderKey}-${rowIndex}-lp`}
           data-colidx="lp"
+          data-rowidx={rowIndex}
           class={'vue-virt-grid-td'}
           style={`height: ${maxHeight}px`}
           rowspan={1}
@@ -224,10 +226,16 @@ export default defineComponent({
         tds.push(
           <td
             key={`${watchData.renderKey}-${rowIndex}-${colIndex}`}
-            data-colidx={colIndex}
+            data-colidx={colIndex + leftFixedColumns.length}
+            data-rowidx={rowIndex}
             class={cls.main(column)}
           >
-            <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell>
+            {/* <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell> */}
+            {getRenderCell({
+              row: row,
+              rowIndex: rowIndex,
+              column: column,
+            })}
           </td>,
         );
       } else if (mergeInfo.rowIndex === rowIndex && mergeInfo.colIndex === colIndex) {
@@ -238,12 +246,18 @@ export default defineComponent({
         tds.push(
           <td
             key={`${watchData.renderKey}-${rowIndex}-${colIndex}`}
-            data-colidx={colIndex}
+            data-colidx={colIndex + leftFixedColumns.length}
+            data-rowidx={rowIndex}
             class={cls.main(column)}
             colspan={colspan}
             rowspan={rowspan}
           >
-            <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell>
+            {/* <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell> */}
+            {getRenderCell({
+              row: row,
+              rowIndex: rowIndex,
+              column: column,
+            })}
           </td>,
         );
         // 直接跳过
@@ -257,6 +271,7 @@ export default defineComponent({
         <td
           key={`${watchData.renderKey}-${rowIndex}-rp`}
           data-colidx="rp"
+          data-rowidx={rowIndex}
           class={'vue-virt-grid-td'}
           style={`height: ${maxHeight}px`}
           rowspan={1}
@@ -274,7 +289,8 @@ export default defineComponent({
         tds.push(
           <td
             // key={`${watchData.renderKey}-${rowIndex}-lp`}
-            data-colidx={column.colIndex}
+            data-colidx={colIndex + leftFixedColumns.length + centerNormalColumns.length}
+            data-rowidx={rowIndex}
             class={cls.rightFixed(column, colIndex)}
             style={`text-align: ${column.align}; right: ${
               headerCellInfo[column._id].right

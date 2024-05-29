@@ -52,7 +52,7 @@ const columns: Column[] = [
     // },
     // 方式2
     bodyRender: (column: Column, row: ListItem) => {
-      console.log('bodyRender', column, row);
+      // console.log('bodyRender', column, row);
       return <CustomCell column={column} row={row}></CustomCell>;
     },
   },

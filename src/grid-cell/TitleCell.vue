@@ -48,13 +48,14 @@
 <script setup lang="ts">
 import { inject, computed } from 'vue';
 import type { GridStore } from '@/src/store';
-import Placement from '../Placement.vue';
 import type { ListItem, ColumnItem } from '@/src/type';
+import Placement from '@/src/components/Placement.vue';
 
 const gridStore = inject('gridStore') as GridStore;
 const { watchData } = gridStore;
 
 const props = defineProps<{
+  rowIndex: number;
   row: ListItem;
   column: ColumnItem;
 }>();

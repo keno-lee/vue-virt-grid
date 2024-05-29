@@ -35,8 +35,7 @@ import { inject } from 'vue';
 import type { GridStore } from '@/src/store';
 import { useObserverItem } from 'vue-virt-list';
 import { type ListItem } from '@/src/type';
-
-import Placement from './Placement.vue';
+import Placement from '@/src/components/Placement.vue';
 
 const gridStore = inject('gridStore') as GridStore;
 const { foldMap, config } = gridStore.watchData;

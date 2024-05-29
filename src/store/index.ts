@@ -230,6 +230,7 @@ export class GridStore {
   // 用于内部事件的触发
   eventEmitter = new EventEmitter();
 
+  // TODO 仅合并单元格模式需要计算，提升性能
   calcRect(horizontal?: boolean): any {
     // console.time('calcRect');
     const topMerges: any = [];
@@ -580,6 +581,10 @@ export class GridStore {
     console.log('forceUpdate');
   }
 
+  setMerges(merges: MergeCell[]) {
+    this.merges = merges;
+  }
+
   setRowKey(key: string | number) {
     this.rowKey = key;
     this.virtualListProps.itemKey = key;
@@ -903,8 +908,12 @@ export class GridStore {
     this.resetFlatList();
   }
 
-  setUIProps<T extends keyof IUIProps>(key: T, value: IUIProps[T]) {
-    this.uiProps[key] = value;
+  // setUIProps<T extends keyof IUIProps>(key: T, value: IUIProps[T]) {
+  //   this.uiProps[key] = value;
+  // }
+
+  setUIProps(data: IUIProps) {
+    this.uiProps = { ...this.uiProps, ...data };
   }
 
   getUIProps<T extends keyof IUIProps>(key: T): IUIProps[T] {

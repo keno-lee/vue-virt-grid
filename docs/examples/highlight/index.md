@@ -4,14 +4,12 @@
 
 ## 悬浮 行(hover)
 
-考虑下是否添加hover列高亮
-
 <!<< ./HighlightHoverView.vue
 
 ## 选中 行/列(select)
 
 <!<< ./HighlightSelectView.vue
 
-## 区域选中 + 行列高亮
+## 区域选中 + 行列高亮 （要改样式）
 
 <!<< ./SelectionHighlightView.vue

@@ -184,7 +184,11 @@ const props = withDefaults(
     rowMinHeight: 40,
 
     showHeader: true,
-    defaultExpandAll: false,
+    merges: () => [],
+    // mergeMethods: null,
+    groupConfig: () => [],
+
+    // UI props
     border: false,
     stripe: false,
     showTreeLine: false,
@@ -193,6 +197,7 @@ const props = withDefaults(
     highlightHoverCol: false,
     highlightSelectRow: false,
     highlightSelectCol: false,
+    defaultExpandAll: false,
     headerRowClassName: () => '',
     headerRowStyle: () => '',
     headerCellClassName: () => '',
@@ -201,51 +206,41 @@ const props = withDefaults(
     rowStyle: () => '',
     cellClassName: () => '',
     cellStyle: () => '',
-
-    merges: () => [],
-    // mergeMethods: null,
-    groupConfig: () => [],
   },
 );
 
-// 注入
+// 注入store
 const gridStore = new GridStore();
 provide('gridStore', gridStore);
 
 // 在这里处理好数据，传递给GridMain
-gridStore.setUIProps('border', props.border);
-gridStore.setUIProps('stripe', props.stripe);
-gridStore.setUIProps('showTreeLine', props.showTreeLine);
-gridStore.setUIProps('selection', props.selection);
-gridStore.setUIProps('highlightHoverRow', props.highlightHoverRow);
-gridStore.setUIProps('highlightHoverCol', props.highlightHoverCol);
-gridStore.setUIProps('highlightSelectRow', props.highlightSelectRow);
-gridStore.setUIProps('highlightSelectCol', props.highlightSelectCol);
-gridStore.setUIProps('defaultExpandAll', props.defaultExpandAll);
-gridStore.setUIProps('headerRowClassName', props.headerRowClassName);
-gridStore.setUIProps('headerRowStyle', props.headerRowStyle);
-gridStore.setUIProps('headerCellClassName', props.headerCellClassName);
-gridStore.setUIProps('headerCellStyle', props.headerCellStyle);
-gridStore.setUIProps('rowClassName', props.rowClassName);
-gridStore.setUIProps('rowStyle', props.rowStyle);
-gridStore.setUIProps('cellClassName', props.cellClassName);
-gridStore.setUIProps('cellStyle', props.cellStyle);
+gridStore.setUIProps({
+  border: props.border,
+  stripe: props.stripe,
+  showTreeLine: props.showTreeLine,
+  selection: props.selection,
+  highlightHoverRow: props.highlightHoverRow,
+  highlightHoverCol: props.highlightHoverCol,
+  highlightSelectRow: props.highlightSelectRow,
+  highlightSelectCol: props.highlightSelectCol,
+  defaultExpandAll: props.defaultExpandAll,
+  headerRowClassName: props.headerRowClassName,
+  headerRowStyle: props.headerRowStyle,
+  headerCellClassName: props.headerCellClassName,
+  headerCellStyle: props.headerCellStyle,
+  rowClassName: props.rowClassName,
+  rowStyle: props.rowStyle,
+  cellClassName: props.cellClassName,
+  cellStyle: props.cellStyle,
+});
 
-// 如果有合并单元格信息，就设置
+gridStore.setRowKey(props.rowKey);
+
 gridStore.setColumns(props.columns);
 
-// 这里处理合并单元格信息
-if (props.merges) {
-  gridStore.merges = props.merges;
-}
+gridStore.setMerges(props.merges);
 
-if (props.rowKey) {
-  gridStore.setRowKey(props.rowKey);
-}
-
-if (props.rowMinHeight) {
-  gridStore.setRowMinHeight(props.rowMinHeight);
-}
+gridStore.setRowMinHeight(props.rowMinHeight);
 
 let list = props.list;
 
@@ -288,27 +283,16 @@ watch(
 );
 
 const { centerNormalColumns, leftFixedColumns, rightFixedColumns } = gridStore;
-
+// 计算可视区域内的列
 function calcVisibleColumns(scrollLeft: number, clientWidth: number) {
   // console.log('calcVisibleColumns', scrollLeft, clientWidth);
-
   let colRenderBegin = 0;
   let colRenderEnd = 0;
-
-  // TODO 无所谓要不要算，影响不是很大，先注释在这里
-  // let currentLeft = leftFixedColumns.reduce(
-  //   (total, column: Column) => total + column?.width ?? 200,
-  //   0,
-  // );
-  // const clientWidth2 =
-  //   clientWidth - rightFixedColumns.reduce((total, column: Column) => total + column?.width ?? 200, 0);
-
   let currentLeft = 0;
   let beginFlag = false;
   for (let i = 0; i < centerNormalColumns.length; i++) {
     const currentWidth = centerNormalColumns[i].width!;
     // console.log('currentWidth', currentLeft, scrollLeft, scrollLeft + clientWidth);
-
     if (currentLeft >= scrollLeft && !beginFlag) {
       colRenderBegin = i;
       beginFlag = true;
@@ -321,6 +305,7 @@ function calcVisibleColumns(scrollLeft: number, clientWidth: number) {
     currentLeft += currentWidth;
   }
   // 给首尾各加一个buffer
+  // TODO 这里可以减少点
   colRenderBegin = Math.max(0, colRenderBegin - 1);
   colRenderEnd = Math.min(centerNormalColumns.length - 1, colRenderEnd + 1);
 
@@ -335,8 +320,6 @@ function calcVisibleColumns(scrollLeft: number, clientWidth: number) {
     watchData.originRect.xe = colRenderEnd;
 
     gridStore.calcRect(true);
-
-    // gridStore.virtualListRef?.forceUpdate();
   }
 }
 
@@ -359,7 +342,6 @@ const emitFunction = {
   itemResize: (id: string, height: number) => {
     const lastHeight = gridStore.watchData.rowHeightMap.get(String(id)) ?? props.rowMinHeight;
     gridStore.watchData.rowHeightMap.set(String(id), Math.max(lastHeight, height));
-    // console.log('maxHeight', id, height);
   },
 };
 
@@ -429,6 +411,7 @@ onBeforeUnmount(() => {
   gridStore.eventEmitter.offAll();
 });
 
+// TODO 拆出去做hook处理
 function onMouseDown(evt: MouseEvent) {
   const path = evt.composedPath() as HTMLElement[];
   // console.log(evt, path);
