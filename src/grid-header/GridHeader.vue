@@ -1,6 +1,6 @@
 <template>
   <GridHeaderRow
-    v-for="(currentColumn, index) in leftFixedHeaderColumns"
+    v-for="(currentColumn, index) in columnsInfo.leftFixedHeaderColumns"
     :key="index"
     :currentColumn="currentColumn"
     :headerRowIndex="index"
@@ -9,22 +9,19 @@
   </GridHeaderRow>
 </template>
 <script lang="ts" setup>
-import { inject, computed } from 'vue';
-import type { GridStore } from '@/src/store';
+import { computed } from 'vue';
+import { useGridStore } from '@/src/store';
 import GridHeaderRow from './GridHeaderRow.vue';
+// import GridHeaderRow from './GridHeaderRow';
 import type { ColumnItem } from '@/src/type';
 
-const gridStore = inject('gridStore') as GridStore;
-const { leftFixedHeaderColumns } = gridStore;
+const gridStore = useGridStore();
+const { columnsInfo } = gridStore;
 
 const centerColumnsInfo = computed(() => {
-  // console.log(
-  //   'calcHeaderVisibleColumns',
-  //   gridStore.watchData.colRenderBegin,
-  //   gridStore.watchData.colRenderEnd,
-  // );
+  const { centerNormalColumns, columnsInfo } = gridStore;
 
-  const { centerNormalColumns, centerNormalHeaderColumns, headerCellInfo } = gridStore;
+  const { headerCellInfo, centerNormalHeaderColumns } = columnsInfo;
 
   const centerColumnsInfo: ColumnItem[][] = [];
 
@@ -33,16 +30,10 @@ const centerColumnsInfo = computed(() => {
     const { parentColumn } = headerCellInfo[col._id];
     if (parentColumn) {
       resetRender(parentColumn);
-      // headerCellInfo[parentColumn._id].rendered = false;
     }
   };
   centerNormalColumns.forEach((col) => {
     resetRender(col);
-    // headerCellInfo[col._id].rendered = false;
-    // const { parentColumn } = headerCellInfo[col._id];
-    // if (parentColumn) {
-    //   headerCellInfo[parentColumn._id].rendered = false;
-    // }
   });
 
   const renderHeader = (column: ColumnItem) => {
@@ -61,33 +52,10 @@ const centerColumnsInfo = computed(() => {
     }
   };
 
-  // console.log('headerCellInfo',  JSON.parse(JSON.stringify(headerCellInfo)))
   // 这些都是要渲染的表头单元格
   for (let i = gridStore.watchData.renderRect.xs; i <= gridStore.watchData.renderRect.xe; i++) {
     const column = centerNormalColumns[i];
     renderHeader(column);
-    // // console.log('要渲染', column._id, headerCellInfo[column._id]);
-    // const { level = 0, parentColumn } = headerCellInfo[column._id];
-    // if (centerColumnsInfo[level] === undefined) {
-    //   centerColumnsInfo[level] = [];
-    // }
-    // centerColumnsInfo[level].push(column);
-    // headerCellInfo[column._id].rendered = true;
-
-    // // 如果有父级，那么就要渲染父级
-    // if (parentColumn) {
-    //   // console.log('要渲染', parentColumn, headerCellInfo[parentColumn.id]);
-    //   const { level: parentLevel = 0 } = headerCellInfo[parentColumn._id];
-    //   console.warn('parent-1', parentColumn, parentLevel, centerColumnsInfo[parentLevel]);
-    //   if (centerColumnsInfo[parentLevel] === undefined) {
-    //     centerColumnsInfo[parentLevel] = [];
-    //   }
-    //   if (centerColumnsInfo[parentLevel].indexOf(parentColumn) < 0) {
-    //     // 如果不存在，那么就加入渲染
-    //     centerColumnsInfo[parentLevel].push(parentColumn);
-    //     headerCellInfo[parentColumn._id].rendered = true;
-    //   }
-    // }
   }
 
   const baseLeftPadding: number[] = [];
@@ -139,7 +107,7 @@ const centerColumnsInfo = computed(() => {
     }
   }
 
-  // console.log('centerColumnsInfo =======================', centerColumnsInfo);
+  console.log('centerColumnsInfo =======================', centerColumnsInfo);
   return centerColumnsInfo;
 });
 </script>

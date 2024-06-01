@@ -13,7 +13,7 @@ const checkAndGetThInfo = (e: MouseEvent, gridStore: GridStore) => {
   if (thEl) {
     const colId = (thEl as HTMLElement).dataset.id;
     if (colId === undefined) return;
-    const targetColumnData = gridStore.headerCellInfo[colId];
+    const targetColumnData = gridStore.columnsInfo.headerCellInfo[colId];
     return {
       event: e,
       column: targetColumnData,

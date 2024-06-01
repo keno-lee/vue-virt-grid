@@ -1,5 +1,5 @@
-import { inject, computed, defineComponent, type PropType } from 'vue';
-import type { GridStore } from '@/src/store';
+import { computed, defineComponent, type PropType } from 'vue';
+import { useGridStore } from '@/src/store';
 import { ColumnType, type ColumnItem, type ListItem } from '@/src/type';
 import { getMergeInfo } from '@/src/utils/merge';
 import { useObserverItem } from 'vue-virt-list';
@@ -27,7 +27,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const gridStore = inject('gridStore') as GridStore;
+    const gridStore = useGridStore();
     // const { headerCellInfo } = gridStore;
 
     const { itemRefEl } = useObserverItem({
@@ -109,11 +109,10 @@ export default defineComponent({
     };
 
     const cls = {
-      leftFixed: (column: ColumnItem, index: number) => [
+      leftFixed: (column: ColumnItem) => [
         'vue-virt-grid-td',
         'is-fixed',
         'is-fixed--left',
-        // index === mainRenderInfo.value.leftColumns.length - 1 && 'is-last-column',
         column._id === selectColId.value && 'current-column',
         gridStore.getSelectionClass(props.rowIndex, column),
         getCellClass(column),
@@ -128,11 +127,10 @@ export default defineComponent({
         column.className,
       ],
       rightPadding: () => ['vue-virt-grid-td'],
-      rightFixed: (column: ColumnItem, index: number) => [
+      rightFixed: (column: ColumnItem) => [
         'vue-virt-grid-td',
         'is-fixed',
         'is-fixed--right',
-        index === 0 && 'is-first-column',
         column._id === selectColId.value && 'current-column',
         gridStore.getSelectionClass(props.rowIndex, column),
         getCellClass(column),
@@ -164,8 +162,9 @@ export default defineComponent({
       leftFixedColumns,
       rightFixedColumns,
       centerNormalColumns,
-      headerCellInfo,
+      columnsInfo,
     } = this.gridStore;
+    const { headerCellInfo } = columnsInfo;
     const { row, rowIndex, maxHeight, getCellStyle, getRowStyle, getRenderCell, cls } = this;
 
     const tds = [];
@@ -180,9 +179,9 @@ export default defineComponent({
             // key={`${watchData.renderKey}-${rowIndex}-lp`}
             data-colidx={column.colIndex}
             data-rowidx={rowIndex}
-            class={cls.leftFixed(column, colIndex)}
+            class={cls.leftFixed(column)}
             style={`text-align: ${column.align}; left: ${
-              headerCellInfo[column._id].left
+              headerCellInfo[column._id].fixOffset
             }px; ${getCellStyle(column)}`}
           >
             {getRenderCell({
@@ -291,9 +290,9 @@ export default defineComponent({
             // key={`${watchData.renderKey}-${rowIndex}-lp`}
             data-colidx={colIndex + leftFixedColumns.length + centerNormalColumns.length}
             data-rowidx={rowIndex}
-            class={cls.rightFixed(column, colIndex)}
+            class={cls.rightFixed(column)}
             style={`text-align: ${column.align}; right: ${
-              headerCellInfo[column._id].right
+              headerCellInfo[column._id].fixOffset
             }px; ${getCellStyle(column)}`}
           >
             {getRenderCell({

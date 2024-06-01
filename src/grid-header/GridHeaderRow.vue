@@ -1,12 +1,15 @@
 <template>
   <tr ref="itemRefEl" :class="cls.row()" :style="getRowStyle()">
     <!-- 左侧固定列 -->
-    <template v-for="(column, index) in leftFixedHeaderColumns[headerRowIndex]" :key="column.field">
+    <template
+      v-for="column in leftFixedHeaderColumns[headerRowIndex]"
+      :key="`${column.field}-${gridStore.watchData.renderKey}-${column._id}`"
+    >
       <th
         :data-id="column._id"
-        :class="cls.leftFixed(column, index)"
+        :class="cls.leftFixed(column)"
         :style="`text-align: ${column.headerAlign || column.align}; left: ${
-          headerCellInfo[column._id].left
+          headerCellInfo[column._id].fixOffset
         }px; ${getCellStyle(column)}`"
         :rowspan="headerCellInfo[column._id]?.rowspan"
         :colspan="headerCellInfo[column._id]?.colspan"
@@ -32,15 +35,12 @@
     <!-- TODO 有点问题 -->
     <th :class="cls.rightPadding" :colspan="rightCount" v-if="rightCount > 0"></th>
     <!-- 右侧固定列 -->
-    <template
-      v-for="(column, index) in rightFixedHeaderColumns[headerRowIndex]"
-      :key="column.field"
-    >
+    <template v-for="column in rightFixedHeaderColumns[headerRowIndex]" :key="column.field">
       <th
         :data-id="column._id"
-        :class="cls.rightFixed(column, index)"
+        :class="cls.rightFixed(column)"
         :style="`text-align: ${column.headerAlign || column.align}; right: ${
-          headerCellInfo[column._id].right
+          headerCellInfo[column._id].fixOffset
         }px; ${getCellStyle(column)}`"
         :rowspan="headerCellInfo[column._id]?.rowspan"
         :colspan="headerCellInfo[column._id]?.colspan"
@@ -52,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import { inject, computed, ref, onUpdated } from 'vue';
-import type { GridStore } from '@/src/store';
+import { computed, ref, onUpdated } from 'vue';
+import { useGridStore } from '@/src/store';
 import { ColumnType, type ColumnItem } from '@/src/type';
 
 import IndexHeaderCell from './cell/IndexHeaderCell.vue';
@@ -62,32 +62,30 @@ import CheckboxHeaderCell from './cell/CheckboxHeaderCell.vue';
 import TextHeaderCell from './cell/TextHeaderCell.vue';
 import { useResizeColumn } from '@/src/hooks/useResizeColumn';
 
-const gridStore = inject('gridStore') as GridStore;
+const gridStore = useGridStore();
 
-const {
-  headerCellInfo,
-  leftFixedHeaderColumns,
-  rightFixedHeaderColumns,
-  centerNormalHeaderColumns,
-} = gridStore;
+const { columnsInfo } = gridStore;
+
+const headerCellInfo = computed(() => columnsInfo.headerCellInfo);
+const leftFixedHeaderColumns = computed(() => columnsInfo.leftFixedHeaderColumns);
+const rightFixedHeaderColumns = computed(() => columnsInfo.rightFixedHeaderColumns);
+const centerNormalHeaderColumns = computed(() => columnsInfo.centerNormalHeaderColumns);
 
 const cls = {
-  leftFixed: (column: ColumnItem, index: number) => [
+  leftFixed: (column: ColumnItem) => [
     'vue-virt-grid-th',
     'is-fixed',
     'is-fixed--left',
-    index === leftFixedHeaderColumns[props.headerRowIndex].length - 1 && 'is-last-column',
     getCellClass(column),
     column.className,
   ],
   leftPadding: () => ['vue-virt-grid-th'],
   main: (column: ColumnItem) => ['vue-virt-grid-th', getCellClass(column), column.className],
   rightPadding: () => ['vue-virt-grid-th'],
-  rightFixed: (column: ColumnItem, index: number) => [
+  rightFixed: (column: ColumnItem) => [
     'vue-virt-grid-th',
     'is-fixed',
     'is-fixed--right',
-    index === 0 && 'is-first-column',
     getCellClass(column),
     column.className,
   ],
@@ -108,20 +106,20 @@ const leftCount = computed(() => {
   const currentHeaderFirstColumn = currentHeaderColumns?.[0];
 
   // console.log('currentHeaderFirstColumn -------------', currentHeaderFirstColumn);
-  return headerCellInfo[currentHeaderFirstColumn?._id]?.leftColspan ?? 0;
+  return headerCellInfo.value[currentHeaderFirstColumn?._id]?.leftColspan ?? 0;
 });
 
 const rightCount = computed(() => {
   const currentHeaderColumns = props.centerColumnsInfo[props.headerRowIndex];
   const currentHeaderLastColumn = currentHeaderColumns?.[currentHeaderColumns?.length - 1];
   const currentHeaderLastColumnLeftColspan =
-    headerCellInfo[currentHeaderLastColumn?._id]?.leftColspan ?? 0;
+    headerCellInfo.value[currentHeaderLastColumn?._id]?.leftColspan ?? 0;
 
-  const currentCenterNormalHeaderColumns = centerNormalHeaderColumns[props.headerRowIndex];
+  const currentCenterNormalHeaderColumns = centerNormalHeaderColumns.value[props.headerRowIndex];
   const currentHeaderNormalHeaderLastColumn =
     currentCenterNormalHeaderColumns?.[currentCenterNormalHeaderColumns?.length - 1];
   const currentHeaderNormalHeaderLastColumnLeftColspan =
-    headerCellInfo[currentHeaderNormalHeaderLastColumn?._id]?.leftColspan ?? 0;
+    headerCellInfo.value[currentHeaderNormalHeaderLastColumn?._id]?.leftColspan ?? 0;
 
   // console.log(
   //   'currentHeaderLastColumn -------------',
@@ -131,9 +129,9 @@ const rightCount = computed(() => {
   return currentHeaderNormalHeaderLastColumnLeftColspan - currentHeaderLastColumnLeftColspan;
 });
 
-const fullRow = leftFixedHeaderColumns[props.headerRowIndex].concat(
-  centerNormalHeaderColumns[props.headerRowIndex],
-  rightFixedHeaderColumns[props.headerRowIndex],
+const fullRow = leftFixedHeaderColumns.value[props.headerRowIndex].concat(
+  centerNormalHeaderColumns.value[props.headerRowIndex],
+  rightFixedHeaderColumns.value[props.headerRowIndex],
 );
 
 const getRowClass = () => {
@@ -184,10 +182,11 @@ const itemRefEl = ref<HTMLElement>();
 onUpdated(() => {
   itemRefEl.value?.querySelectorAll(':scope>th[data-id]').forEach((item) => {
     const colId = item.getAttribute('data-id');
-    if (!colId || !headerCellInfo[colId]?.resizable || !headerCellInfo[colId]?.isLeaf) return;
+    if (!colId || !headerCellInfo.value[colId]?.resizable || !headerCellInfo.value[colId]?.isLeaf)
+      return;
     useResizeColumn(
       item as HTMLElement,
-      headerCellInfo[colId]!,
+      headerCellInfo.value[colId]!,
       gridStore.tableRootEl!,
       (width) => {
         if (colId) gridStore.setColumnWidth(colId, width);

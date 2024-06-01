@@ -77,6 +77,14 @@
         </tfoot> -->
       </table>
     </div>
+    <div
+      :class="cls.leftFixedShadow"
+      :style="{ left: `${gridStore.watchData.fixedInfo.leftWidth || 0}px` }"
+    ></div>
+    <div
+      :class="cls.rightFixedShadow"
+      :style="{ right: `${gridStore.watchData.fixedInfo.rightWidth + 16 || 0}px` }"
+    ></div>
     <div class="vue-virt-grid-mask" v-if="!list.length">
       <slot name="empty"><p>No Data</p></slot>
     </div>
@@ -89,6 +97,7 @@ import { GridStore } from '@/src/store';
 import { useContentEvent } from '@/src/hooks/useEvent';
 
 import GridHeader from '@/src/grid-header/GridHeader.vue';
+// import GridHeader from '@/src/grid-header/GridHeader';
 // import BaseRow from '@/src/grid-row/BaseRow.vue';
 import BaseRow from '@/src/grid-row/BaseRow';
 import GroupRow from '@/src/grid-row/GroupRow.vue';
@@ -378,6 +387,18 @@ const cls = computed(() => ({
     gridStore.getUIProps('highlightHoverRow') && 'vue-virt-grid-main--highlight-hover-row',
   ],
   table: ['vue-virt-grid-table', gridStore.gridScrollingStatus.value],
+  leftFixedShadow: [
+    'vue-virt-grid-fixed-shadow',
+    gridStore.gridScrollingStatus.value !== 'is-scrolling-left' && leftFixedColumns.length > 0
+      ? 'vue-virt-grid-fixed-shadow--left'
+      : '',
+  ],
+  rightFixedShadow: [
+    'vue-virt-grid-fixed-shadow',
+    gridStore.gridScrollingStatus.value !== 'is-scrolling-right' && rightFixedColumns.length > 0
+      ? 'vue-virt-grid-fixed-shadow--right'
+      : '',
+  ],
 }));
 const fullWidth = computed(() => {
   return gridStore.watchData.fullWidth;

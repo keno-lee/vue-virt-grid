@@ -506,3 +506,35 @@ tbody.vue-virt-grid-body {
     }
   }
 }
+
+.vue-virt-grid-fixed-shadow {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  z-index: 7;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 10px;
+    bottom: -1px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    box-shadow: none;
+    touch-action: none;
+    pointer-events: none;
+    box-shadow: none;
+  }
+}
+
+.vue-virt-grid-fixed-shadow--left {
+  &::before {
+    box-shadow: var(--#{$prefix}-fixed-left-column);
+  }
+}
+
+.vue-virt-grid-fixed-shadow--right {
+  &::before {
+    box-shadow: var(--#{$prefix}-fixed-right-column);
+  }
+}

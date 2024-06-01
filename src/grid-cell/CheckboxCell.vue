@@ -11,11 +11,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { inject } from 'vue';
 import type { ListItem, ColumnItem } from '@/src/type';
-import type { GridStore } from '@/src/store';
+import { useGridStore } from '@/src/store';
 
-const gridStore = inject('gridStore') as GridStore;
+const gridStore = useGridStore();
 const { watchData } = gridStore;
 
 const props = defineProps<{
