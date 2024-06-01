@@ -20,11 +20,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { inject, withDefaults } from 'vue';
-import type { GridStore } from '@/src/store';
+import { useGridStore } from '@/src/store';
 import type { ListItem, ColumnItem } from '@/src/type';
 
-const gridStore = inject('gridStore') as GridStore;
+const gridStore = useGridStore();
 
 const { watchData } = gridStore;
 

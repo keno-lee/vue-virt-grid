@@ -8,12 +8,12 @@
   </tr>
 </template>
 <script setup lang="ts">
-import { inject, computed } from 'vue';
-import type { GridStore } from '@/src/store';
+import { computed } from 'vue';
+import { useGridStore } from '@/src/store';
 import { useObserverItem } from 'vue-virt-list';
 import { type ListItem } from '@/src/type';
 
-const gridStore = inject('gridStore') as GridStore;
+const gridStore = useGridStore();
 const { flattedColumns } = gridStore;
 
 const expandCol = computed(() => flattedColumns.find((c) => c.type === 'expand'));

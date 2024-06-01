@@ -31,13 +31,12 @@
   </tr>
 </template>
 <script setup lang="ts">
-import { inject } from 'vue';
-import type { GridStore } from '@/src/store';
+import { useGridStore } from '@/src/store';
 import { useObserverItem } from 'vue-virt-list';
 import { type ListItem } from '@/src/type';
 import Placement from '@/src/components/Placement.vue';
 
-const gridStore = inject('gridStore') as GridStore;
+const gridStore = useGridStore();
 const { foldMap, config } = gridStore.watchData;
 const { flattedColumns } = gridStore;
 

@@ -12,11 +12,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, inject, watch } from 'vue';
+import { computed } from 'vue';
 import type { ColumnItem } from '@/src/type';
-import type { GridStore } from '@/src/store';
+import { useGridStore } from '@/src/store';
 
-const gridStore = inject('gridStore') as GridStore;
+const gridStore = useGridStore();
 const { watchData, virtualListProps } = gridStore;
 
 defineProps<{

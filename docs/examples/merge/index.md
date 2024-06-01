@@ -1,5 +1,5 @@
 # 合并单元格
 
-## 表身合并
+## 标头合并
 
-<!<< ./MergeView.vue
+<!<< ./MergeHeaderAndFixedView.vue

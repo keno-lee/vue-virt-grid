@@ -1,4 +1,4 @@
-import { computed, reactive, shallowReactive, shallowRef, ref, type ShallowRef } from 'vue';
+import { reactive, shallowReactive, ref, inject } from 'vue';
 import {
   ColumnType,
   type Column,
@@ -91,6 +91,15 @@ export interface IInteractionProps {
   selectCellClassMap: Record<string, string>;
 }
 
+export interface IColumnsRenderInfo {
+  leftFixedColumns: ColumnItem[];
+  rightFixedColumns: ColumnItem[];
+  centerNormalHeaderColumns: ColumnItem[][];
+  leftFixedHeaderColumns: ColumnItem[][];
+  rightFixedHeaderColumns: ColumnItem[][];
+  headerCellInfo: HeaderCellInfo;
+}
+
 export class GridStore {
   // 响应式数据
   watchData = reactive({
@@ -131,6 +140,11 @@ export class GridStore {
       ye: 0,
       xs: 0,
       xe: 0,
+    },
+
+    fixedInfo: {
+      leftWidth: 0,
+      rightWidth: 0,
     },
   });
 
@@ -186,6 +200,15 @@ export class GridStore {
     selectCellClassMap: {},
   });
 
+  columnsInfo = shallowReactive<IColumnsRenderInfo>({
+    leftFixedColumns: [],
+    rightFixedColumns: [],
+    leftFixedHeaderColumns: [],
+    rightFixedHeaderColumns: [],
+    centerNormalHeaderColumns: [],
+    headerCellInfo: {},
+  });
+
   merges = [] as MergeCell[];
   tempMerges = [] as MergeCell[];
 
@@ -209,10 +232,7 @@ export class GridStore {
   originList = [] as ListItem[];
 
   // TODO 2个要删除
-  tempMergeMap = {} as any;
   bodyMergeMap = {} as any;
-
-  headerCellInfo: HeaderCellInfo = {};
 
   gridSelection = new GridSelection(this);
   gridScrollZone = new GridScrollZone(this);
@@ -297,7 +317,7 @@ export class GridStore {
           const mergeInfo = getMergeInfo(this.merges, y, x);
           if (mergeInfo) {
             // 只要是有合并信息的都加进去
-            const { rowIndex, colIndex, rowspan, colspan } = mergeInfo;
+            const { rowIndex, rowspan } = mergeInfo;
             // console.warn('最后一行', y, x, mergeInfo);
             rye = Math.max(rye, rowIndex + rowspan - 1);
             // rxs = Math.min(rxs, colIndex);
@@ -608,18 +628,23 @@ export class GridStore {
       leftFixedHeaderColumns,
       rightFixedHeaderColumns,
       centerNormalHeaderColumns,
+
+      fixedInfo,
     } = formatColumns(columns);
 
     this.leftFixedColumns = leftFixedColumns;
     this.rightFixedColumns = rightFixedColumns;
     this.centerNormalColumns = centerNormalColumns;
     this.flattedColumns = flattedColumns;
-    this.headerCellInfo = headerCellInfo;
     this.originColumns = originColumns;
 
-    this.leftFixedHeaderColumns = leftFixedHeaderColumns;
-    this.rightFixedHeaderColumns = rightFixedHeaderColumns;
-    this.centerNormalHeaderColumns = centerNormalHeaderColumns;
+    this.watchData.fixedInfo = fixedInfo;
+    this.columnsInfo.headerCellInfo = headerCellInfo;
+    this.columnsInfo.leftFixedColumns = leftFixedColumns;
+    this.columnsInfo.rightFixedColumns = rightFixedColumns;
+    this.columnsInfo.leftFixedHeaderColumns = leftFixedHeaderColumns;
+    this.columnsInfo.rightFixedHeaderColumns = rightFixedHeaderColumns;
+    this.columnsInfo.centerNormalHeaderColumns = centerNormalHeaderColumns;
     // this.flattedColumns = flattedColumns;
     // // 拿平铺的列进行遍历
     // let leftReduce = 0;
@@ -1253,3 +1278,7 @@ export class GridStore {
     }
   }
 }
+
+export const useGridStore = () => {
+  return inject<GridStore>('gridStore')!;
+};
