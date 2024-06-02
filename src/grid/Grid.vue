@@ -115,6 +115,7 @@ import {
   TableEventEnum,
   type Column,
 } from '@/src/type';
+import { clearResizeLine } from '../hooks/useResizeColumn';
 
 const emits = defineEmits<CellEmits & RowEmits & HeaderEmits & TableEmits>();
 
@@ -341,6 +342,8 @@ const emitFunction = {
     const { scrollLeft, scrollWidth, clientWidth } = evt.target as HTMLElement;
     calcVisibleColumns(scrollLeft, clientWidth);
     calcFixedShadow(scrollLeft, scrollWidth, clientWidth);
+    // 滚动时清除列宽调整的线
+    clearResizeLine();
   },
   toTop: () => {
     // console.log('toTop');
