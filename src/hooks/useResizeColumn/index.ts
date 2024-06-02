@@ -19,6 +19,15 @@ function isInitialized(el: HTMLElement) {
   return !!(el as any).__resizeTrigger;
 }
 
+// 全局唯一，防止重复创建
+let resizeLine: HTMLElement | undefined;
+
+export const clearResizeLine = () => {
+  if (!resizeLine) return;
+  resizeLine.remove();
+  resizeLine = undefined;
+};
+
 export function useResizeColumn(
   columnEl: HTMLElement,
   headerInfo: ColumnItem,
@@ -63,7 +72,7 @@ export function useResizeColumn(
   onUpdated(() => setupTrigger);
   watch(() => [columnEl, headerInfo], setupTrigger, { immediate: true });
 
-  let resizeLine: HTMLElement | undefined;
+  // let resizeLine: HTMLElement | undefined;
 
   function setupResizeLine(e: MouseEvent) {
     if (!tableRootEl) return;

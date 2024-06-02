@@ -14,6 +14,7 @@ export interface FormatColumns {
   rightFixedHeaderColumns: ColumnItem[][];
   centerNormalHeaderColumns: ColumnItem[][];
 
+  // 左右固定列的宽度
   fixedInfo: {
     leftWidth: number;
     rightWidth: number;
@@ -148,18 +149,15 @@ export const formatColumns = (originColumns: Column[]): FormatColumns => {
     parentId,
     parentColumn,
     fixed,
-    parentLeftReduce = 0,
   }: {
     columns: Column[];
     level?: number;
     parentId?: number | string;
     parentColumn?: ColumnItem;
     fixed?: 'left' | 'right' | '';
-    parentLeftReduce?: number;
   }) {
     maxLevel = Math.max(maxLevel, level);
     let childCountReduce = 0;
-    let leftReduce: number = parentLeftReduce;
     columns.forEach((_col) => {
       // TODO 这里给一个默认值
       const column = _col as ColumnItem;
@@ -192,7 +190,6 @@ export const formatColumns = (originColumns: Column[]): FormatColumns => {
           parentId: column._id,
           parentColumn: column,
           fixed: column.fixed,
-          parentLeftReduce: leftReduce,
         });
         headerCellInfo[column._id].colspan = childCount;
         // TODO
@@ -208,19 +205,12 @@ export const formatColumns = (originColumns: Column[]): FormatColumns => {
         // flattedColumns.push(column);
 
         if (column.fixed === 'left') {
-          // headerCellInfo[column._id].left = leftReduce;
-          // leftReduce += column.width;
           leftFixedColumns.push(column);
         } else if (column.fixed === 'right') {
           rightFixedColumns.push(column);
         } else {
           centerNormalColumns.push(column);
         }
-      }
-      if (column.fixed === 'left') {
-        headerCellInfo[column._id].left = leftReduce;
-        const colSpan = headerCellInfo[column._id].colspan || 1;
-        leftReduce += column.width * colSpan;
       }
       if (parentId !== undefined) {
         headerCellInfo[column._id].parentId = parentId;
@@ -271,12 +261,7 @@ export const formatColumns = (originColumns: Column[]): FormatColumns => {
       centerNormalHeaderColumns.push(levelMain);
     }
 
-    // console.log('leftFixedHeaderColumns', leftFixedHeaderColumns);
-    // console.log('rightFixedHeaderColumns', rightFixedHeaderColumns);
-    // console.log('centerNormalHeaderColumns', centerNormalHeaderColumns);
-
     return {
-      // result,
       leftFixedHeaderColumns,
       rightFixedHeaderColumns,
       centerNormalHeaderColumns,
@@ -286,7 +271,6 @@ export const formatColumns = (originColumns: Column[]): FormatColumns => {
   const { leftFixedHeaderColumns, rightFixedHeaderColumns, centerNormalHeaderColumns } = bfs(
     originColumns as ColumnItem[],
   );
-  console.warn('aa', leftFixedHeaderColumns);
   // 计算右侧fixed的值
   let rightReduce = 0;
   for (let i = rightFixedColumns.length - 1; i >= 0; i--) {
@@ -314,6 +298,7 @@ export const formatColumns = (originColumns: Column[]): FormatColumns => {
     }
   }
 
+  // 对列进行处理后重新排序
   const flattedColumns: ColumnItem[] = [
     ...leftFixedColumns,
     ...centerNormalColumns,
@@ -322,12 +307,6 @@ export const formatColumns = (originColumns: Column[]): FormatColumns => {
   flattedColumns.forEach((col, index) => {
     col.colIndex = index;
   });
-
-  // console.warn('leftFixedColumns', leftFixedColumns);
-  // console.warn('rightFixedColumns', rightFixedColumns);
-  // console.warn('centerNormalColumns', centerNormalColumns);
-  // console.log('originColumns', originColumns);
-  console.warn('headerCellInfo', headerCellInfo);
 
   return {
     headerCellInfo,
