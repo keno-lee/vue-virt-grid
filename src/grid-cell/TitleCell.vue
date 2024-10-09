@@ -63,7 +63,7 @@ const props = defineProps<{
 const showTreeLine = computed(() => gridStore.getUIProps('showTreeLine'));
 
 const customBody = computed(() => {
-  return props.column?.bodyRender?.(props.column, props.row);
+  return props.column?.customCellRender?.(props.column, props.row);
 });
 </script>
 <style lang="scss">

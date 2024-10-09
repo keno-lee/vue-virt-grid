@@ -1,5 +1,5 @@
 import {
-  ColumnType,
+  CellType,
   type Column,
   type ListItem,
   type MergeCell,

@@ -1,3 +1,3 @@
 # Spreadsheet
 
-<!<< ././Spreadsheet.vue
+<!<< ./Spreadsheet.vue

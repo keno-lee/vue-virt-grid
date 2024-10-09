@@ -1,26 +1,32 @@
 import type { VNode } from 'vue';
 import type { JSX } from 'vue/jsx-runtime';
 
-export enum ColumnType {
-  Index = 'index',
-  Title = 'title',
-  Checkbox = 'checkbox',
-  Radio = 'radio',
+export enum ColumnSpecType {
   Expand = 'expand',
-  Text = 'text',
-  // orderCheckbox = 'orderCheckbox',
+  Title = 'title',
 }
-
+// 单元格类型
+export enum CellType {
+  Index = 'index',
+  Radio = 'radio',
+  Checkbox = 'checkbox',
+  Text = 'text',
+  Link = 'Link',
+  Select = 'Select',
+  MultiSelect = 'MultiSelect',
+  Image = 'Image',
+  Person = 'Person',
+}
 /**
  * 用户配置时的列配置
  */
 export type Column = {
   // 数据key-对应list中的key
-  field?: string;
+  field: string;
   // 列标题
   title?: string;
   // 列类型
-  type?: ColumnType;
+  type?: CellType | ColumnSpecType | string;
   // 列宽度
   width?: number;
   // 最小列宽度
@@ -41,7 +47,14 @@ export type Column = {
   className?: string;
 
   headerRender?: (column: Column) => VNode | JSX.Element;
-  bodyRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
+  // 自定义单元格渲染
+  customCellRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
+  // 自定义单元格覆盖渲染
+  customCellCoverRender?: (tdData: TdData) => VNode | JSX.Element;
+  // 自定义单元格下拉渲染
+  customCellDropdownRender?: (tdData: TdData) => VNode | JSX.Element;
+
+  bodyActiveRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
   index?: (index: number) => number;
 
   // TODO 铸韬，可以改到headerCellInfo中
@@ -83,7 +96,12 @@ export interface MergeCell {
   colspan: number;
 }
 
-export type ListItem<T extends Record<string, unknown> = Record<string, unknown>> = {
+type CellExtra = {
+  type: CellType | string;
+  value: string;
+};
+
+export type ListItem<T = any> = {
   id: string;
   // 只区分group和item，item包含父子节点
   type?: 'group' | 'expand' | 'item';
@@ -96,6 +114,17 @@ export type ListItem<T extends Record<string, unknown> = Record<string, unknown>
 
   isLastChild?: boolean;
 } & T;
+
+export type TdData = {
+  column: Column;
+  columnIndex: number;
+  row: ListItem;
+  rowIndex: number;
+  cell: string | number | CellExtra;
+  el: HTMLElement;
+  event: Event;
+  rect: DOMRect;
+};
 
 export enum CellEventEnum {
   CellClick = 'cellClick',

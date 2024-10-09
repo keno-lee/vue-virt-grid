@@ -1,14 +1,14 @@
 <template>
   <GridTable :list="list" border stripe :showTreeLine="true" defaultExpandAll :merges="merges">
-    <GridTableColumn key="1" field="field1" :width="100" :type="ColumnType.Text" title="field1" />
-    <GridTableColumn key="2" field="field2" :width="100" :type="ColumnType.Text" title="field2">
-      <GridTableColumn key="3" field="field3" :width="100" :type="ColumnType.Text" title="field3" />
+    <GridTableColumn key="1" field="field1" :width="100" :type="CellType.Text" title="field1" />
+    <GridTableColumn key="2" field="field2" :width="100" :type="CellType.Text" title="field2">
+      <GridTableColumn key="3" field="field3" :width="100" :type="CellType.Text" title="field3" />
     </GridTableColumn>
-    <GridTableColumn key="4" field="field4" :width="100" :type="ColumnType.Text" title="field4" />
+    <GridTableColumn key="4" field="field4" :width="100" :type="CellType.Text" title="field4" />
   </GridTable>
 </template>
 <script setup lang="ts">
-import { GridTable, GridTableColumn, type ListItem, ColumnType } from 'vue-virt-grid';
+import { GridTable, GridTableColumn, type ListItem, CellType } from 'vue-virt-grid';
 
 const list: ListItem[] = [
   {

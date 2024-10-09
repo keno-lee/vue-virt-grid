@@ -6,14 +6,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Grid, type Column, type ListItem, ColumnType } from 'vue-virt-grid';
+import { Grid, type Column, type ListItem, CellType, ColumnSpecType } from 'vue-virt-grid';
 
 const columns: Column[] = [];
 for (let i = 0; i < 10; i++) {
   columns.push({
     field: `key${i}`,
     title: `title${i}`,
-    type: i === 0 ? ColumnType.Title : ColumnType.Text,
+    type: i === 0 ? ColumnSpecType.Title : CellType.Text,
     width: i == 0 ? 400 : 200,
   });
 }
@@ -22,7 +22,7 @@ const list: ListItem[] = [];
 for (let i = 0; i < 1000; i++) {
   const item = {
     id: i.toString(),
-    key0: `row${i}-key`,
+    key0: `row${i}-title`,
     key1: `row${i}-key1`,
     key2: `row${i}-key2`,
     key3: `row${i}-key3`,

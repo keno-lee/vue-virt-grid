@@ -42,17 +42,17 @@
 </template>
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { Grid, type Column, type ListItem, ColumnType } from 'vue-virt-grid';
+import { Grid, type Column, type ListItem, CellType, ColumnSpecType } from 'vue-virt-grid';
 import { ElButton, ElSelect, ElOption } from 'element-plus';
 import 'element-plus/dist/index.css';
 
 const columns: Column[] = [
   // FIXME: 这里需要想一下是默认第一列就是title还是？
-  { field: 'key1', title: 'title1', type: ColumnType.Title, width: 200 },
-  { field: 'key7', title: 'title7', type: ColumnType.Text, width: 200 },
-  { field: 'key10', title: 'title10', type: ColumnType.Text, width: 200 },
-  { field: 'key11', title: 'title11', type: ColumnType.Text, width: 200 },
-  { field: 'key12', title: 'title12', type: ColumnType.Text, width: 200 },
+  { field: 'key1', title: 'title1', type: ColumnSpecType.Title, width: 200 },
+  { field: 'key7', title: 'title7', type: CellType.Text, width: 200 },
+  { field: 'key10', title: 'title10', type: CellType.Text, width: 200 },
+  { field: 'key11', title: 'title11', type: CellType.Text, width: 200 },
+  { field: 'key12', title: 'title12', type: CellType.Text, width: 200 },
 ];
 
 const groupConfig = ref<{ columnId: string; sort: 'desc' | 'asc' }[]>([

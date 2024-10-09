@@ -12,7 +12,7 @@
       key="expand"
       field="expand"
       fixed="left"
-      :type="ColumnType.Expand"
+      :type="ColumnSpecType.Expand"
       :width="50"
     >
       <template #default="{ row }"> expand row {{ row.key }} </template>
@@ -25,7 +25,13 @@
   </GridTable>
 </template>
 <script lang="ts" setup>
-import { GridTable, GridTableColumn, type Column, type ListItem, ColumnType } from 'vue-virt-grid';
+import {
+  GridTable,
+  GridTableColumn,
+  type Column,
+  type ListItem,
+  ColumnSpecType,
+} from 'vue-virt-grid';
 
 const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
   Array.from({ length }).map((_, columnIndex) => ({

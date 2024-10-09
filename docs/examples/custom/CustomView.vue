@@ -46,13 +46,13 @@ const columns: Column[] = [
       return <div>{column.field}</div>;
     },
     // 方式1
-    // bodyRender: (column: Column, row: ListItem) => {
-    //   console.log('bodyRender', column, row);
+    // customCellRender: (column: Column, row: ListItem) => {
+    //   console.log('customCellRender', column, row);
     //   return <div>{row[column.field]}</div>;
     // },
     // 方式2
-    bodyRender: (column: Column, row: ListItem) => {
-      // console.log('bodyRender', column, row);
+    customCellRender: (column: Column, row: ListItem) => {
+      // console.log('customCellRender', column, row);
       return <CustomCell column={column} row={row}></CustomCell>;
     },
   },

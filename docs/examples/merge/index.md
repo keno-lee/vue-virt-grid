@@ -4,6 +4,6 @@
 
 <!<< ./MergeView.vue
 
-## 标头合并
+## 表头合并
 
 <!<< ./MergeHeaderAndFixedView.vue

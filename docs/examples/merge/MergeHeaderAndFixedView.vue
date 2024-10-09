@@ -6,13 +6,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Grid, type Column, type ListItem, ColumnType } from 'vue-virt-grid';
+import { Grid, type Column, type ListItem, CellType } from 'vue-virt-grid';
 
 const columns: Column[] = [
   {
     field: 'key1',
     title: 'key1',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     fixed: 'left',
     resizable: true,
@@ -20,48 +20,48 @@ const columns: Column[] = [
   {
     field: 'key2',
     title: 'key2',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     fixed: 'left',
     children: [
       {
         field: 'key2-1',
         title: 'key2-1',
-        type: ColumnType.Text,
+        type: CellType.Text,
         width: 200,
         fixed: 'left',
         children: [
           {
             field: 'key2-1-1',
             title: 'key2-1-1',
-            type: ColumnType.Text,
+            type: CellType.Text,
             width: 200,
             children: [
               {
                 field: 'key2-1-1-1',
                 title: 'key2-1-1-1',
-                type: ColumnType.Text,
+                type: CellType.Text,
                 width: 200,
               },
               {
                 field: 'key2-1-1-2',
                 title: 'key2-1-1-2',
-                type: ColumnType.Text,
+                type: CellType.Text,
                 width: 100,
               },
             ],
           },
-          { field: 'key2-1-2', title: 'key2-1-2', type: ColumnType.Text, width: 100 },
+          { field: 'key2-1-2', title: 'key2-1-2', type: CellType.Text, width: 100 },
         ],
       },
       {
         field: 'key2-2',
         title: 'key2-2',
-        type: ColumnType.Text,
+        type: CellType.Text,
         width: 200,
         // children: [
-        //   { id: 221, field: 'key221', title: 'title12', type: ColumnType.Text, width: 200 },
-        //   { id: 222, field: 'key222', title: 'title12', type: ColumnType.Text, width: 200 },
+        //   { id: 221, field: 'key221', title: 'title12', type: CellType.Text, width: 200 },
+        //   { id: 222, field: 'key222', title: 'title12', type: CellType.Text, width: 200 },
         // ],
       },
     ],
@@ -69,83 +69,83 @@ const columns: Column[] = [
   {
     field: 'key3',
     title: 'key3',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     children: [
       {
         field: 'key3-1',
         title: 'key3-1',
-        type: ColumnType.Text,
+        type: CellType.Text,
         width: 200,
         // FIXME: 有bug
-        children: [{ field: 'key3-1-1', title: 'key3-1-1', type: ColumnType.Text, width: 200 }],
+        children: [{ field: 'key3-1-1', title: 'key3-1-1', type: CellType.Text, width: 200 }],
       },
     ],
   },
   {
     field: 'key4',
     title: 'key4',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
-    children: [{ field: 'key4-1', title: 'key4-1', type: ColumnType.Text, width: 200 }],
+    children: [{ field: 'key4-1', title: 'key4-1', type: CellType.Text, width: 200 }],
   },
   {
     field: 'key5',
     title: 'key5',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     // fixed: 'right',
-    children: [{ field: 'key5-1', title: 'key5-1', type: ColumnType.Text, width: 200 }],
+    children: [{ field: 'key5-1', title: 'key5-1', type: CellType.Text, width: 200 }],
   },
   {
     field: 'key6',
     title: 'key6',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     // fixed: 'right',
-    children: [{ field: 'key6-1', title: 'key6-1', type: ColumnType.Text, width: 200 }],
+    children: [{ field: 'key6-1', title: 'key6-1', type: CellType.Text, width: 200 }],
   },
   {
     field: 'key7',
     title: 'key7',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     // fixed: 'right',
-    children: [{ field: 'key7-1', title: 'key7-1', type: ColumnType.Text, width: 200 }],
+    children: [{ field: 'key7-1', title: 'key7-1', type: CellType.Text, width: 200 }],
   },
   {
     field: 'key8',
     title: 'key8',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     // fixed: 'right',
-    children: [{ field: 'key8-1', title: 'key8-1', type: ColumnType.Text, width: 200 }],
+    children: [{ field: 'key8-1', title: 'key8-1', type: CellType.Text, width: 200 }],
   },
   {
     field: 'key9',
     title: 'key9',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     // fixed: 'right',
-    children: [{ field: 'key9-1', title: 'key9-1', type: ColumnType.Text, width: 200 }],
+    children: [{ field: 'key9-1', title: 'key9-1', type: CellType.Text, width: 200 }],
   },
   {
     field: 'key10',
     title: 'key10',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     // fixed: 'right',
-    children: [{ field: 'key10-1', title: 'key10-1', type: ColumnType.Text, width: 200 }],
+    children: [{ field: 'key10-1', title: 'key10-1', type: CellType.Text, width: 200 }],
   },
   {
     field: 'key11',
     title: 'key11',
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 200,
     // fixed: 'right',
     children: [
-      { field: 'key11-1', title: 'key11-1', type: ColumnType.Text, width: 200 },
-      { field: 'key11-2', title: 'key11-2', type: ColumnType.Text, width: 200 },
+      { field: 'key11-1', title: 'key11-1', type: CellType.Text, width: 200 },
+      { field: 'key11-2', title: 'key11-2', type: CellType.Text, width: 200 },
     ],
   },
 ];

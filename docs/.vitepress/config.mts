@@ -48,8 +48,45 @@ export default defineConfig({
         { text: '主题', link: '/guide/theme/' },
       ],
       '/examples/': [
-        { text: '基础功能', link: '/examples/base/' },
+        // TODO 目标菜单
+        // {
+        //   text: '基础功能',
+        //   collapsed: false,
+        //   items: [
+        //     { text: '基础', link: '/examples/base/' },
+        //     { text: 'hover高亮', link: '/examples/highlight/' },
+        //     // { text: '悬浮列高亮', link: '/examples/highlight/' },
+        //     { text: '选中行高亮', link: '/examples/highlight/' },
+        //     { text: '选中列高亮', link: '/examples/highlight/' },
+        //     { text: '单元格选中高亮', link: '/examples/highlight/' },
+        //     // 高阶功能
+        //     { text: '区域选中', link: '/examples/highlight/' },
+        //   ],
+        // },
+        // {
+        //   text: '合并',
+        // },
+        // {
+        //   text: '展开',
+        // },
+        // {
+        //   text: '树形',
+        // },
+        // {
+        //   text: '表尾巴',
+        // },
+        // {
+        //   text: '单元格',
+        // },
+        // {
+        //   text: '事件',
+        // },
+        // {
+        //   text: '事件',
+        // },
 
+        //
+        { text: '基础功能', link: '/examples/base/' },
         {
           text: '行设置',
           collapsed: false,
@@ -84,6 +121,7 @@ export default defineConfig({
             { text: 'template', link: '/examples/table/' },
             { text: '区域选中', link: '/examples/selection/' },
             { text: 'spreadsheet(实验室)', link: '/examples/spreadsheet/' },
+            { text: 'Cells', link: '/examples/cells/' },
           ],
         },
         // { text: 'tfoot(实验室)', link: '/examples/tfoot/' },

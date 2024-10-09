@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import { computed, ref, onUpdated } from 'vue';
 import { useGridStore } from '@/src/store';
-import { ColumnType, type ColumnItem } from '@/src/type';
+import { CellType, type ColumnItem } from '@/src/type';
 
 import IndexHeaderCell from './cell/IndexHeaderCell.vue';
 // import OrderHeaderCell from './cell/OrderHeaderCell.vue';
@@ -201,13 +201,13 @@ function getRenderCell(column: ColumnItem) {
   //   return TextHeaderCell;
   // }
   switch (column.type) {
-    case ColumnType.Index:
+    case CellType.Index:
       return IndexHeaderCell;
-    case ColumnType.Checkbox:
+    case CellType.Checkbox:
       return CheckboxHeaderCell;
-    case ColumnType.Radio:
+    case CellType.Radio:
       return TextHeaderCell;
-    // case ColumnType.orderCheckbox:
+    // case CellType.orderCheckbox:
     //   return OrderHeaderCell;
     default:
       if (column?.headerRender) return column?.headerRender?.(column);

@@ -1,6 +1,7 @@
 import { reactive, shallowReactive, ref, inject } from 'vue';
 import {
-  ColumnType,
+  CellType,
+  ColumnSpecType,
   type Column,
   type ListItem,
   type MergeCell,
@@ -16,6 +17,7 @@ import { GridScrollZone } from '@/src/interaction/scrollZone';
 import { useTableEvent } from '@/src/hooks/useEvent/useTableEvent';
 import { isEqual, unionWith } from 'lodash-es';
 import { getMergeInfo } from '@/src/utils/merge';
+import { InteractionTest } from './interactionTest';
 
 export type MergeInfoMap = Record<
   number,
@@ -117,7 +119,7 @@ export class GridStore {
     // 唯一
     radioRow: null as null | ListItem,
 
-    // FIXME： 分组不需要这个，要重新写分组逻辑
+    // FIXME 分组不需要这个，要重新写分组逻辑
     // 配置
     config: {
       rowHeight: 36,
@@ -148,6 +150,8 @@ export class GridStore {
     },
   });
 
+  config: any = {};
+
   rowKey: string | number = 'id';
 
   // 非响应式
@@ -157,13 +161,10 @@ export class GridStore {
     itemKey: this.rowKey,
     // buffer: 4,
     renderControl: (begin: number, end: number) => {
-      // console.error('renderControl inview', begin, end);
       this.watchData.originRect.ys = begin;
       this.watchData.originRect.ye = end;
 
       const { ys, ye } = this.calcRect();
-
-      // console.error('renderControl render', ys, ye);
 
       return {
         begin: ys ?? begin,
@@ -210,6 +211,7 @@ export class GridStore {
   });
 
   merges = [] as MergeCell[];
+  // 生成渲染合并单元格
   tempMerges = [] as MergeCell[];
 
   // 原始列数据（带 _id），一般不直接用
@@ -231,9 +233,6 @@ export class GridStore {
   // 记一下原始的list
   originList = [] as ListItem[];
 
-  // TODO 2个要删除
-  bodyMergeMap = {} as any;
-
   gridSelection = new GridSelection(this);
   gridScrollZone = new GridScrollZone(this);
 
@@ -250,9 +249,23 @@ export class GridStore {
   // 用于内部事件的触发
   eventEmitter = new EventEmitter();
 
+  // 交互层
+  interactionTest: InteractionTest;
+
+  constructor() {
+    this.interactionTest = new InteractionTest(this);
+  }
+
   // TODO 仅合并单元格模式需要计算，提升性能
   calcRect(horizontal?: boolean): any {
-    // console.time('calcRect');
+    // 如果没有合并单元格，就不需要计算了
+    if (this.merges.length <= 0) {
+      this.watchData.renderRect.xs = this.watchData.originRect.xs;
+      this.watchData.renderRect.xe = this.watchData.originRect.xe;
+      return { ys: this.watchData.originRect.ys, ye: this.watchData.originRect.ye };
+    }
+
+    console.time('calcRect');
     const topMerges: any = [];
     const leftMerges: any = [];
     const rightMerges: any = [];
@@ -592,13 +605,14 @@ export class GridStore {
     };
   }
 
-  constructor() {
-    this.gridSelection.on(this.handleSelectionChange);
-  }
-
   forceUpdate() {
     this.watchData.renderKey += 1;
     console.log('forceUpdate');
+  }
+
+  setConfig(config: any) {
+    this.config = config;
+    console.log('this.config', this.config);
   }
 
   setMerges(merges: MergeCell[]) {
@@ -704,6 +718,8 @@ export class GridStore {
 
   addAllCheckboxRows() {
     this.watchData.checkboxRows = new Set(this.virtualListProps.list);
+    // console.log('addAllCheckboxRows', this.watchData.checkboxRows);
+    this.forceUpdate();
   }
 
   clearCheckboxRows() {
@@ -728,7 +744,7 @@ export class GridStore {
 
     const { foldMap, expandMap } = this.watchData;
 
-    const hasExpandCol = !!this.flattedColumns.find((col) => col.type === ColumnType.Expand);
+    const hasExpandCol = !!this.flattedColumns.find((col) => col.type === ColumnSpecType.Expand);
 
     const defaultExpandAll = this.getUIProps('defaultExpandAll');
 
@@ -945,128 +961,6 @@ export class GridStore {
     return this.uiProps[key];
   }
 
-  handleSelectionChange = (
-    id: string,
-    area: { left: number; top: number; right: number; bottom: number },
-    isMultiple: boolean,
-  ) => {
-    const mergedArea = this.expandMergedSelectArea(area);
-
-    let selectBoxes = {
-      [id]: mergedArea,
-    };
-
-    if (isMultiple) {
-      selectBoxes = {
-        ...this.interaction.selectBoxes,
-        ...selectBoxes,
-      };
-    }
-
-    const posMap: Record<string, Set<ISelectionBorderPos>> = {};
-    const cellBorderMap: Record<string, ISelectionBorderPos[]> = {};
-
-    Object.keys(selectBoxes).forEach((boxId) => {
-      const { left, top, right, bottom } = selectBoxes[boxId];
-      for (let i = top; i <= bottom; i++) {
-        for (let j = left; j <= right; j++) {
-          const posId = `${i}-${j}`;
-          if (!posMap[posId]) {
-            posMap[posId] = new Set();
-          }
-          if (i === top || i === bottom || j === left || j === right) {
-            if (i === top && j === left) {
-              posMap[posId].add('left-top');
-            }
-            if (i === top && j === right) {
-              posMap[posId].add('right-top');
-            }
-            if (i === bottom && j === left) {
-              posMap[posId].add('left-bottom');
-            }
-            if (i === bottom && j === right) {
-              posMap[posId].add('right-bottom');
-            }
-            if (j > left && j < right) {
-              if (i === top) {
-                posMap[posId].add('top');
-              }
-              if (i === bottom) {
-                posMap[posId].add('bottom');
-              }
-            }
-            if (i > top && i < bottom) {
-              if (j === left) {
-                posMap[posId].add('left');
-              }
-              if (j === right) {
-                posMap[posId].add('right');
-              }
-            }
-          } else {
-            posMap[posId].add('center');
-          }
-        }
-      }
-    });
-
-    Object.keys(posMap).forEach((posId) => {
-      const poses = posMap[posId];
-      if (
-        (poses.has('left-top') && poses.has('right-bottom')) ||
-        (poses.has('left-bottom') && poses.has('right-top'))
-      ) {
-        cellBorderMap[posId] = ['left-top', 'right-bottom'];
-      } else {
-        cellBorderMap[posId] = [...posMap[posId]];
-      }
-    });
-
-    const cellClass: Record<string, string> = {};
-    const selectedCells: SelectedCells[] = [];
-    const selectedArea: SelectedCells[][] = [];
-    const visitedCellId = new Set<string>();
-
-    Object.keys(selectBoxes).forEach((boxId) => {
-      const { left: nLeft, top: nTop, right: nRight, bottom: nBottom } = selectBoxes[boxId];
-      const cells = [];
-      for (let i = nTop; i <= nBottom; i++) {
-        for (let j = nLeft; j <= nRight; j++) {
-          const posId = `${i}-${j}`;
-          const mergeInfo = this.bodyMergeMap[i]?.[j];
-          const colspan = mergeInfo?.colspan;
-          const rowspan = mergeInfo?.rowspan;
-          cellClass[posId] = this.selectCellClassConstructor(cellBorderMap, i, j, rowspan, colspan);
-
-          if (!mergeInfo || colspan || rowspan) {
-            const cellData = {
-              row: this.virtualListProps.list[i],
-              rowIndex: i,
-              column: this.flattedColumns[j],
-              columnIndex: j,
-            };
-            cells.push(cellData);
-            if (!visitedCellId.has(posId)) {
-              selectedCells.push(cellData);
-            }
-            visitedCellId.add(posId);
-          }
-        }
-      }
-      selectedArea.push(cells);
-    });
-
-    const tableEvents = useTableEvent(this);
-    tableEvents.onCellSelection({
-      areas: selectedArea,
-      cells: selectedCells,
-    });
-    this.interaction.selectBoxes = selectBoxes;
-    this.interaction.selectCellBorderMap = cellBorderMap;
-    this.interaction.selectCellClassMap = cellClass;
-    this.forceUpdate();
-  };
-
   expandMergedSelectArea(area: { left: number; top: number; right: number; bottom: number }) {
     const { left, top, right, bottom } = area;
     const mergedArea = { ...area };
@@ -1190,7 +1084,7 @@ export class GridStore {
     const colIndex = column.colIndex;
     const type = column.type;
 
-    if (type === ColumnType.Expand || type === ColumnType.Index || type === ColumnType.Checkbox) {
+    if (type === ColumnSpecType.Expand || type === CellType.Index || type === CellType.Checkbox) {
       return 'vue-virt-grid-cell--unselectable';
     }
 
@@ -1222,42 +1116,6 @@ export class GridStore {
     if (this.getUIProps('highlightSelectCol')) {
       this.selectColId.value = this.flattedColumns[colIndex]._id;
     }
-  }
-
-  setRowSelection(
-    areaId = nanoid(4),
-    startRowIndex: number,
-    endRowIndex: number,
-    isMulti: boolean,
-  ) {
-    this.handleSelectionChange(
-      areaId,
-      {
-        left: 0,
-        right: this.flattedColumns.length,
-        top: startRowIndex,
-        bottom: endRowIndex,
-      },
-      isMulti,
-    );
-  }
-
-  setColumnSelection(
-    areaId = nanoid(4),
-    startColumnIndex: number,
-    endColumnIndex: number,
-    isMulti: boolean,
-  ) {
-    this.handleSelectionChange(
-      areaId,
-      {
-        left: startColumnIndex,
-        right: endColumnIndex,
-        top: 0,
-        bottom: this.virtualListProps.list.length,
-      },
-      isMulti,
-    );
   }
 
   initVirtualListRef(elRef: GridStore['virtualListRef']) {

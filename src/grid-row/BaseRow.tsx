@@ -1,6 +1,6 @@
 import { computed, defineComponent, type PropType } from 'vue';
 import { useGridStore } from '@/src/store';
-import { ColumnType, type ColumnItem, type ListItem } from '@/src/type';
+import { CellType, ColumnSpecType, type ColumnItem, type ListItem } from '@/src/type';
 import { getMergeInfo } from '@/src/utils/merge';
 import { useObserverItem } from 'vue-virt-list';
 import TitleCell from '@/src/grid-cell/TitleCell.vue';
@@ -56,19 +56,28 @@ export default defineComponent({
       rowIndex: number;
       column: ColumnItem;
     }) => {
-      switch (column.type) {
-        case ColumnType.Index:
+      // 1. 判断cell是否存在自定义渲染 customCellRender
+      // 2. 判断columns是否存在自定义渲染 customCellRender
+      // 3. 判断全局自定义渲染函数 customCellRender
+      const type = row[column.field]?.type ?? column?.type;
+      const customCellRender =
+        row[column.field]?.customCellRender ??
+        column?.customCellRender ??
+        gridStore.config.customCellRender;
+      // 4. 走默认TextCell
+      switch (type) {
+        case CellType.Index:
           return <IndexCell rowIndex={rowIndex} row={row} column={column}></IndexCell>;
-        case ColumnType.Title:
+        case ColumnSpecType.Title:
           return <TitleCell rowIndex={rowIndex} row={row} column={column}></TitleCell>;
-        case ColumnType.Checkbox:
+        case CellType.Checkbox:
           return <CheckboxCell rowIndex={rowIndex} row={row} column={column}></CheckboxCell>;
-        case ColumnType.Radio:
+        case CellType.Radio:
           return <RadioCell rowIndex={rowIndex} row={row} column={column}></RadioCell>;
-        case ColumnType.Expand:
+        case ColumnSpecType.Expand:
           return <ExpandCell rowIndex={rowIndex} row={row} column={column}></ExpandCell>;
         default:
-          if (column.bodyRender) return column?.bodyRender?.(column, props.row);
+          if (customCellRender) return customCellRender(column, props.row);
           return <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell>;
       }
     };
@@ -176,8 +185,8 @@ export default defineComponent({
 
         tds.push(
           <td
-            // key={`${watchData.renderKey}-${rowIndex}-lp`}
-            data-colidx={column.colIndex}
+            key={`${watchData.renderKey}-${rowIndex}-${colIndex}`}
+            data-colidx={colIndex}
             data-rowidx={rowIndex}
             class={cls.leftFixed(column)}
             style={`text-align: ${column.align}; left: ${
@@ -210,6 +219,7 @@ export default defineComponent({
     // 主体单元格
     for (let colIndex = watchData.renderRect.xs; colIndex <= watchData.renderRect.xe; colIndex++) {
       const column = centerNormalColumns[colIndex];
+      const actualColIndex = colIndex + leftFixedColumns.length;
 
       const mergeInfo =
         getMergeInfo(tempMerges, rowIndex, colIndex) ??
@@ -224,8 +234,8 @@ export default defineComponent({
         // 无合并单元格
         tds.push(
           <td
-            key={`${watchData.renderKey}-${rowIndex}-${colIndex}`}
-            data-colidx={colIndex + leftFixedColumns.length}
+            key={`${watchData.renderKey}-${rowIndex}-${actualColIndex}`}
+            data-colidx={actualColIndex}
             data-rowidx={rowIndex}
             class={cls.main(column)}
           >
@@ -244,8 +254,8 @@ export default defineComponent({
 
         tds.push(
           <td
-            key={`${watchData.renderKey}-${rowIndex}-${colIndex}`}
-            data-colidx={colIndex + leftFixedColumns.length}
+            key={`${watchData.renderKey}-${rowIndex}-${actualColIndex}`}
+            data-colidx={actualColIndex}
             data-rowidx={rowIndex}
             class={cls.main(column)}
             colspan={colspan}
@@ -285,10 +295,11 @@ export default defineComponent({
     if (rightFixedColumns.length > 0) {
       for (let colIndex = 0; colIndex < rightFixedColumns.length; colIndex++) {
         const column = rightFixedColumns[colIndex];
+        const actualColIndex = colIndex + leftFixedColumns.length + centerNormalColumns.length;
         tds.push(
           <td
-            // key={`${watchData.renderKey}-${rowIndex}-lp`}
-            data-colidx={colIndex + leftFixedColumns.length + centerNormalColumns.length}
+            key={`${watchData.renderKey}-${rowIndex}-${actualColIndex}`}
+            data-colidx={actualColIndex}
             data-rowidx={rowIndex}
             class={cls.rightFixed(column)}
             style={`text-align: ${column.align}; right: ${

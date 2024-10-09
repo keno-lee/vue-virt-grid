@@ -49,6 +49,9 @@ export type Options = {
   autoWidth?: boolean;
   // 自定义宽度
   width?: string | number;
+
+  autoHeight?: boolean;
+
   // 是否手动控制事件监听
   manual?: boolean;
   // 承载容器padding
@@ -89,11 +92,111 @@ export interface IVirtualElement {
     | void;
 }
 
-const isHTMLElement = (el: any): el is HTMLElement =>
-  el && el instanceof HTMLElement;
+const isHTMLElement = (el: any): el is HTMLElement => el && el instanceof HTMLElement;
 
 const onError = () => {
   console.error('invalid reference or popper ');
+};
+
+export const isScrollElement = (element: HTMLElement) => {
+  const clientHeight =
+    element === document.documentElement ? element.clientHeight : element.offsetHeight;
+  const clientWidth =
+    element === document.documentElement ? element.clientWidth : element.offsetWidth;
+
+  return element.scrollHeight > clientHeight || element.scrollWidth > clientWidth;
+};
+
+/**
+ * 从当前节点向上查找所有的滚动元素
+ * @param container 当前节点
+ * @param top 查找到 top 节点就终止，不再继续查找
+ * @returns
+ */
+export const getAncestorScrollElement = (
+  container: HTMLElement,
+  top: HTMLElement = document.documentElement,
+): HTMLElement | null => {
+  let scrollElement: HTMLElement | null = null;
+  let element: HTMLElement | null = container;
+  while (element && element !== top && !scrollElement) {
+    if (isScrollElement(element)) {
+      scrollElement = element;
+    }
+    element = element.parentElement;
+  }
+  return scrollElement;
+};
+
+export const createPopper2 = (
+  reference: HTMLElement,
+  popperContainer: HTMLElement,
+  mountEl: HTMLElement,
+  popper: HTMLElement | App,
+  options?: Options,
+) => {
+  if (!reference || !popper) {
+    return;
+  }
+  console.log('createPopper2', reference, popper, options);
+
+  let popperEl = null;
+  if (popper instanceof HTMLElement) {
+    popperEl = popper;
+  } else {
+    const div = document.createElement('div');
+    popperEl = popper.mount(div).$el;
+  }
+
+  const { left, top, width, height } = reference.getBoundingClientRect();
+
+  // let popperContainer: HTMLDivElement | null = null;
+  // popperContainer = document.createElement('div');
+  // popperContainer.classList.add('vue-virt-grid-popper-container');
+  // popperContainer.style.zIndex = `999`;
+  // popperContainer.style.position = 'absolute';
+
+  // if (options?.mountEl === undefined || options?.mountEl === reference) {
+  //   // 这种是基于reference的
+  //   reference.appendChild(popperContainer);
+
+  //   popperContainer.style.left = `${0}px`;
+  //   popperContainer.style.top = `${0}px`;
+  //   popperContainer.style.width = `${width - 1}px`;
+  //   popperContainer.style.height = `${height - 1}px`;
+  // } else if (options?.mountEl instanceof HTMLElement) {
+
+  // }
+
+  // 这种是基于mountEl的
+
+  // 监听父容器更新位置
+  // const scrollElements = getAncestorScrollElement(reference);
+  // console.log(scrollElements);
+
+  popperContainer.innerHTML = '';
+
+  const {
+    left: mountElLeft,
+    top: mountElTop,
+    width: mountElWidth,
+    height: mountElHeight,
+  } = mountEl.getBoundingClientRect();
+
+  if (options?.placement === 'bottom-start') {
+    popperContainer.style.left = `${left - mountElLeft - 1}px`;
+    popperContainer.style.top = `${top - mountElTop + height + 2}px`;
+    // popperContainer.style.width = `${width - 1}px`;
+    // popperContainer.style.height = `${height - 1}px`;
+  } else {
+    popperContainer.style.left = `${left - mountElLeft - 1}px`;
+    popperContainer.style.top = `${top - mountElTop - 1}px`;
+    popperContainer.style.width = `${width - 1}px`;
+    popperContainer.style.height = `${height - 1}px`;
+  }
+
+  mountEl.appendChild(popperContainer);
+  popperContainer.appendChild(popperEl);
 };
 
 export const createPopper = (
@@ -101,6 +204,7 @@ export const createPopper = (
   popper?: HTMLElement | App,
   customOptions?: Options,
 ): ILmsPopper => {
+  console.log('createPopper', reference, popper, customOptions);
   if (!reference || !popper) {
     return { close: onError, updatePopper: onError, destroy: onError };
   }
@@ -203,8 +307,7 @@ export const createPopper = (
   const listenerCloseTrigger = (evt: MouseEvent) => {
     const target = (evt.composedPath() as HTMLElement[]).find(
       (ele: HTMLElement) =>
-        ele?.classList?.contains('lms-popper') ||
-        ele?.hasAttribute?.('lms-popper-disable-close'),
+        ele?.classList?.contains('lms-popper') || ele?.hasAttribute?.('lms-popper-disable-close'),
     );
     // 只要点击不包含当前弹窗内容就关闭弹窗
     if (!target) {
@@ -243,8 +346,27 @@ export const createPopper = (
   const scrollEvent = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
-    updatePopper();
+    updatePopperByScroll(e);
   };
+
+  let lastScrollLeft = 0;
+  let lastScrollTop = 0;
+  function updatePopperByScroll(e: Event) {
+    console.log('updatePopperByScroll', e);
+
+    const left = (e.target as HTMLElement).scrollLeft - lastScrollLeft;
+    const top = (e.target as HTMLElement).scrollTop - lastScrollTop;
+    if (!popperContainer) return;
+
+    const lastLeft = Number(popperContainer.style.left.match(/-?[0-9]+/)?.[0] ?? 0);
+    const lastTop = Number(popperContainer.style.top.match(/-?[0-9]+/)?.[0] ?? 0);
+
+    popperContainer.style.left = `${lastLeft - left}px`;
+    popperContainer.style.top = `${lastTop - top}px`;
+
+    lastScrollLeft = (e.target as HTMLElement).scrollLeft;
+    lastScrollTop = (e.target as HTMLElement).scrollTop;
+  }
 
   const addScrollListener = () => {
     let trigger: HTMLElement | null | undefined = options.scrollTrigger;
@@ -292,14 +414,16 @@ export const createPopper = (
   const calculateWidth = () => {
     if (!popperContainer) return;
     if (options.autoWidth) {
-      const { width: referenceWidth } =
-        reference.getBoundingClientRect() as DOMRect;
-      popperContainer.style.width = `${referenceWidth}px`;
+      const { width: referenceWidth } = reference.getBoundingClientRect() as DOMRect;
+      popperContainer.style.width = `${referenceWidth - 2}px`;
     } else if (options.width) {
       popperContainer.style.width =
-        typeof options.width === 'number'
-          ? `${options.width}px`
-          : options.width;
+        typeof options.width === 'number' ? `${options.width}px` : options.width;
+    }
+
+    if (options.autoHeight) {
+      const { height: referenceHeight } = reference.getBoundingClientRect() as DOMRect;
+      popperContainer.style.height = `${referenceHeight - 1}px`;
     }
   };
 
@@ -309,15 +433,8 @@ export const createPopper = (
   }
 
   // popperjs
-  function getSide(
-    placement: Placement,
-  ): 'top' | 'left' | 'bottom' | 'right' | 'center' {
-    return placement.split('-')[0] as
-      | 'top'
-      | 'left'
-      | 'bottom'
-      | 'right'
-      | 'center';
+  function getSide(placement: Placement): 'top' | 'left' | 'bottom' | 'right' | 'center' {
+    return placement.split('-')[0] as 'top' | 'left' | 'bottom' | 'right' | 'center';
   }
 
   // popperjs
@@ -400,14 +517,10 @@ export const createPopper = (
     }
 
     const popperRect = popperContainer.getBoundingClientRect() as DOMRect;
-    const overflowRect = (
-      overflowTrigger as HTMLElement
-    ).getBoundingClientRect();
+    const overflowRect = (overflowTrigger as HTMLElement).getBoundingClientRect();
     const mountRect = (options.mountEl as HTMLElement).getBoundingClientRect();
     const { scrollLeft, scrollTop } = options.mountEl as HTMLElement;
-    const mountElStyle = window.getComputedStyle(
-      options.mountEl as HTMLElement,
-    );
+    const mountElStyle = window.getComputedStyle(options.mountEl as HTMLElement);
 
     const {
       x: referenceX,
@@ -424,12 +537,8 @@ export const createPopper = (
     } = overflowRect;
     const { x: mountContainerX, y: mountContainerY } = mountRect;
 
-    const mountContainerBorderX = parseFloat(
-      mountElStyle.getPropertyValue('border-left-width'),
-    );
-    const mountContainerBorderY = parseFloat(
-      mountElStyle.getPropertyValue('border-top-width'),
-    );
+    const mountContainerBorderX = parseFloat(mountElStyle.getPropertyValue('border-left-width'));
+    const mountContainerBorderY = parseFloat(mountElStyle.getPropertyValue('border-top-width'));
 
     let { placement = 'bottom' } = options;
     const side = getSide(placement);
@@ -438,10 +547,7 @@ export const createPopper = (
     const adjustXAlignment = () => {
       switch (alignment) {
         case 'start':
-          if (
-            referenceX + popperWidth >
-            overflowContainerX + overflowContainerWidth
-          ) {
+          if (referenceX + popperWidth > overflowContainerX + overflowContainerWidth) {
             return 'end';
           }
           break;
@@ -457,18 +563,12 @@ export const createPopper = (
     const adjustYAlignment = () => {
       switch (alignment) {
         case 'start':
-          if (
-            referenceY + popperHeight >
-            overflowContainerY + overflowContainerHeight
-          ) {
+          if (referenceY + popperHeight > overflowContainerY + overflowContainerHeight) {
             return 'end';
           }
           break;
         case 'end':
-          if (
-            referenceY + referenceHeight - popperHeight <
-            overflowContainerY
-          ) {
+          if (referenceY + referenceHeight - popperHeight < overflowContainerY) {
             return 'start';
           }
           break;
@@ -521,15 +621,9 @@ export const createPopper = (
       placement = placement.replace(side, adjustSide()) as Placement;
 
       if (getMainAxisFromPlacement(placement) === 'x') {
-        placement = placement.replace(
-          alignment,
-          adjustXAlignment(),
-        ) as Placement;
+        placement = placement.replace(alignment, adjustXAlignment()) as Placement;
       } else {
-        placement = placement.replace(
-          alignment,
-          adjustYAlignment(),
-        ) as Placement;
+        placement = placement.replace(alignment, adjustYAlignment()) as Placement;
       }
     }
 
@@ -556,23 +650,11 @@ export const createPopper = (
       const { allowOverflow } = options;
       const nonOverflowX = Math.max(
         overflowContainerX + padding[0],
-        Math.min(
-          overflowContainerX +
-            overflowContainerWidth -
-            padding[0] -
-            popperWidth,
-          x,
-        ),
+        Math.min(overflowContainerX + overflowContainerWidth - padding[0] - popperWidth, x),
       );
       const nonOverflowY = Math.max(
         overflowContainerY + padding[1],
-        Math.min(
-          overflowContainerY +
-            overflowContainerHeight -
-            padding[1] -
-            popperHeight,
-          y,
-        ),
+        Math.min(overflowContainerY + overflowContainerHeight - padding[1] - popperHeight, y),
       );
       const popperX = Math.round(
         (allowOverflow ? x : nonOverflowX) -
@@ -599,12 +681,8 @@ export const createPopper = (
         let left = 0;
         let top = 0;
         if (placement.includes('start')) {
-          left =
-            Math.max(0, refX - popperX) +
-            RATE * Math.min(referenceWidth, popperWidth);
-          top =
-            Math.max(0, refY - popperY) +
-            RATE * Math.min(referenceHeight, popperHeight);
+          left = Math.max(0, refX - popperX) + RATE * Math.min(referenceWidth, popperWidth);
+          top = Math.max(0, refY - popperY) + RATE * Math.min(referenceHeight, popperHeight);
         } else if (placement.includes('end')) {
           left =
             Math.max(0, refX - popperX) +
@@ -615,14 +693,9 @@ export const createPopper = (
             (1 - RATE) * Math.min(referenceHeight, popperHeight) -
             OFFSET * 2;
         } else {
-          left =
-            Math.max(0, refX - popperX) +
-            0.5 * Math.min(referenceWidth, popperWidth) -
-            OFFSET;
+          left = Math.max(0, refX - popperX) + 0.5 * Math.min(referenceWidth, popperWidth) - OFFSET;
           top =
-            Math.max(0, refY - popperY) +
-            0.5 * Math.min(referenceHeight, popperHeight) -
-            OFFSET;
+            Math.max(0, refY - popperY) + 0.5 * Math.min(referenceHeight, popperHeight) - OFFSET;
         }
 
         if (placement.includes('top') || placement.includes('bottom')) {

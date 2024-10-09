@@ -89,6 +89,27 @@
   color: var(--#{$prefix}-header-text-color);
 }
 
+// TODO
+.vue-virt-grid-popper-wrapper {
+  z-index: 99;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  // background-color: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+
+  .vue-virt-grid-popper {
+    box-sizing: border-box;
+    position: absolute;
+    pointer-events: all;
+    // border-right: 1px solid var(--vue-virt-grid-border);
+    // border-bottom: 1px solid var(--vue-virt-grid-border);
+    // border: 1px solid red;
+  }
+}
+
 // 样式覆盖
 .vue-virt-grid-main--highlight-hover-row {
   tr.vue-virt-grid-tr:hover {
@@ -503,6 +524,29 @@ tbody.vue-virt-grid-body {
 
     &.row-expand-icon--expand {
       transform: rotate(90deg);
+    }
+  }
+}
+
+// TODO
+.vue-virt-grid-popper-cell {
+  box-sizing: border-box;
+  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-all;
+  // line-height: 23px;
+  padding: 8px 12px;
+
+  &.vue-virt-grid-cell__index {
+    text-align: center;
+    padding: 0;
+  }
+
+  &.vue-virt-grid-cell__checkbox {
+    // text-align: center;
+
+    .vue-virt-grid-cell__checkbox-filed {
+      margin-left: 4px;
     }
   }
 }

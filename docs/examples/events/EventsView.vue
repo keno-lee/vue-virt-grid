@@ -22,7 +22,7 @@
   </div>
 </template>
 <script setup lang="tsx">
-import { Grid, type Column, type ListItem, ColumnType } from 'vue-virt-grid';
+import { Grid, type Column, type ListItem, CellType, ColumnSpecType } from 'vue-virt-grid';
 
 const extraText = `Velit sed aspernatur tempora. Natus consequatur officiis dicta vel assumenda.`;
 
@@ -30,9 +30,9 @@ const columns: Column[] = [
   {
     title: '',
     field: '',
-    type: ColumnType.Expand,
+    type: ColumnSpecType.Expand,
     width: 50,
-    bodyRender: (column, row) => {
+    customCellRender: (column, row) => {
       return (<div style="max-height: 200px; overflow: auto">{extraText}</div>) as any;
     },
   },
@@ -41,7 +41,7 @@ for (let i = 0; i < 100; i++) {
   columns.push({
     field: `key${i}`,
     title: `title${i}`,
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 100,
   });
 }

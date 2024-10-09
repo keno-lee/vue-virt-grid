@@ -6,16 +6,16 @@
   </div>
 </template>
 <script setup lang="tsx">
-import { Grid, type Column, type ListItem, ColumnType } from 'vue-virt-grid';
+import { Grid, type Column, type ListItem, CellType, ColumnSpecType } from 'vue-virt-grid';
 import type { VNode } from 'vue';
 
 const columns: Column[] = [
   {
     title: '',
     field: '',
-    type: ColumnType.Expand,
+    type: ColumnSpecType.Expand,
     width: 50,
-    bodyRender: (column, row) => {
+    customCellRender: (column, row) => {
       return (
         <div>
           <p>展开行包含子表格</p>
@@ -23,21 +23,21 @@ const columns: Column[] = [
             columns={[
               {
                 id: 'index-0',
-                type: ColumnType.Index,
+                type: CellType.Index,
                 width: 50,
               } as any,
               {
                 id: 'index-1',
                 field: 'name',
                 title: `Name`,
-                type: ColumnType.Text,
+                type: CellType.Text,
                 width: 100,
               },
               {
                 id: 'index-2',
                 field: 'attribute',
                 title: `Attribute`,
-                type: ColumnType.Text,
+                type: CellType.Text,
                 width: 100,
               },
             ]}
@@ -65,7 +65,7 @@ for (let i = 0; i < 8; i++) {
   columns.push({
     field: `key${i}`,
     title: `title${i}`,
-    type: ColumnType.Text,
+    type: CellType.Text,
     width: 120,
   });
 }

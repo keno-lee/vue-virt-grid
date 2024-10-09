@@ -11,6 +11,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { computed, inject } from 'vue';
 import type { ListItem, ColumnItem } from '@/src/type';
 import { useGridStore } from '@/src/store';
 
@@ -23,6 +24,10 @@ const props = defineProps<{
   column: ColumnItem;
 }>();
 
+// const isChecked = computed(() => {
+//   console.log(watchData.checkboxRows.has(props.row));
+//   return watchData.checkboxRows.has(props.row);
+// });
 const changeValue = (e: Event) => {
   if ((e?.target as HTMLInputElement)?.checked) {
     gridStore.addCheckboxRows(props.row);
