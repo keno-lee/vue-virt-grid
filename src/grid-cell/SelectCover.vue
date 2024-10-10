@@ -19,11 +19,19 @@
 </template>
 <script setup lang="tsx">
 import { type PropType } from 'vue';
-import { type TdData } from '@/src/type';
+import { type Column, type ListItem, type TdData } from '@/src/type';
 
 const props = defineProps({
+  column: {
+    type: Object as PropType<Column>,
+    default: () => ({}),
+  },
+  row: {
+    type: Object as PropType<ListItem>,
+    default: () => ({}),
+  },
   tdData: {
-    type: Object as PropType<TdData>,
+    type: Object as PropType<any>,
     default: () => ({}),
   },
 });

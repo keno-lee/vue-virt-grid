@@ -49,10 +49,10 @@ export type Column = {
   headerRender?: (column: Column) => VNode | JSX.Element;
   // 自定义单元格渲染
   customCellRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
-  // 自定义单元格覆盖渲染
-  customCellCoverRender?: (tdData: TdData) => VNode | JSX.Element;
+  // 自定义单元格覆盖渲染 多提供一个rect信息
+  customCellCoverRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
   // 自定义单元格下拉渲染
-  customCellDropdownRender?: (tdData: TdData) => VNode | JSX.Element;
+  customCellDropdownRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
 
   bodyActiveRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
   index?: (index: number) => number;

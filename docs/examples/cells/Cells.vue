@@ -53,21 +53,30 @@ const columns: Column[] = [
     width: 200,
   },
   {
+    field: 'global-render',
+    title: 'global-render',
+    width: 200,
+    type: 'custom',
+  },
+  {
     field: 'select',
-    title: 'Select 通过type渲染',
+    title: 'Select type渲染',
     width: 200,
     type: 'Select',
   },
   {
-    field: 'select',
-    title: 'Select',
+    field: 'select1',
+    title: 'Select 自定义渲染',
     width: 200,
-    customCellRender: () => <SelectView />,
+    customCellRender: (column: Column, row: ListItem) => <SelectView column={column} row={row} />,
     // 单击渲染
-    customCellCoverRender: (tdData: TdData) => <SelectCover tdData={tdData} />,
+    customCellCoverRender: (column: Column, row: ListItem, tdData: any) => (
+      <SelectCover column={column} row={row} tdData={tdData} />
+    ),
     // 双击渲染
-    customCellDropdownRender: (tdData: TdData) => <SelectDropdown tdData={tdData} />,
-    // bodyActiveRender: () => <SelectActive />,
+    customCellDropdownRender: (column: Column, row: ListItem, tdData: any) => (
+      <SelectDropdown column={column} row={row} tdData={tdData} />
+    ),
   },
   {
     field: 'date',
@@ -122,290 +131,212 @@ const columns: Column[] = [
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link',
+    field: 'link6',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link1',
+    field: 'link7',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link2',
+    field: 'link8',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link3',
+    field: 'link9',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link4',
+    field: 'link10',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link5',
+    field: 'link11',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link',
+    field: 'link12',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link1',
+    field: 'link13',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link2',
+    field: 'link14',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link3',
+    field: 'link15',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link4',
+    field: 'link16',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link5',
+    field: 'link17',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link',
+    field: 'link18',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link1',
+    field: 'link19',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link2',
+    field: 'link20',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link3',
+    field: 'link21',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link4',
+    field: 'link22',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link5',
+    field: 'link23',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link',
+    field: 'link24',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link1',
+    field: 'link25',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link2',
+    field: 'link26',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link3',
+    field: 'link27',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link4',
+    field: 'link28',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link5',
+    field: 'link29',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link',
+    field: 'link30',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link1',
+    field: 'link31',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link2',
+    field: 'link32',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link3',
+    field: 'link33',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link4',
+    field: 'link34',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link5',
+    field: 'link35',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link',
+    field: 'link36',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link1',
+    field: 'link37',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link2',
+    field: 'link38',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link3',
+    field: 'link39',
     title: 'Link',
     width: 200,
     customCellRender: () => <LinkView />,
   },
   {
-    field: 'link4',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link5',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link1',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link2',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link3',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link4',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link5',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link1',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link2',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link3',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link4',
-    title: 'Link',
-    width: 200,
-    customCellRender: () => <LinkView />,
-  },
-  {
-    field: 'link5',
-    title: 'Link',
+    field: 'link40',
+    title: 'Link40',
     width: 200,
     customCellRender: () => <LinkView />,
   },
@@ -418,22 +349,22 @@ const columns: Column[] = [
 const list: ListItem[] = generateList(columns, 200);
 
 const customConfig = {
-  customCellRender: (tdData: TdData) => {
-    if (tdData.column?.type === 'custom') {
+  customCellRender: (column: Column, row: ListItem) => {
+    if (column?.type === 'custom') {
       // 自定义类型
-      return <div>111</div>;
+      return <div>global custom</div>;
     }
   },
-  customCellCoverRender: (tdData: TdData) => {
-    if (tdData.column?.type === 'custom') {
+  customCellCoverRender: (column: Column, row: ListItem) => {
+    if (column?.type === 'custom') {
       // 自定义类型
-      return <div>111</div>;
+      return <div>global custom</div>;
     }
   },
-  customCellDropdownRender: (tdData: TdData) => {
-    if (tdData.column?.type === 'custom') {
+  customCellDropdownRender: (column: Column, row: ListItem) => {
+    if (column?.type === 'custom') {
       // 自定义类型
-      return <div>111</div>;
+      return <div>global custom</div>;
     }
   },
 };
@@ -443,11 +374,15 @@ list[0].text = {
   // 实际值
   value: 'Text',
   // 渲染函数
-  customCellRender: () => <SelectView />,
+  customCellRender: (column: Column, row: ListItem) => <SelectView column={column} row={row} />,
   // 单击渲染
-  customCellCoverRender: () => <SelectCover />,
+  customCellCoverRender: (column: Column, row: ListItem, tdData: any) => (
+    <SelectCover column={column} row={row} tdData={tdData} />
+  ),
   // 双击渲染
-  customCellDropdownRender: () => <SelectDropdown />,
+  customCellDropdownRender: (column: Column, row: ListItem, tdData: any) => (
+    <SelectDropdown column={column} row={row} tdData={tdData} />
+  ),
 };
 </script>
 <style lang="scss">

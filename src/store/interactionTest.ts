@@ -25,7 +25,7 @@ class InteractionTest {
 
   coverRender(tdData: any) {
     const app = createApp({
-      render: () => tdData.column.customCellCoverRender?.(tdData),
+      render: () => tdData.column.customCellCoverRender?.(tdData.column, tdData.row, tdData),
     });
     const mountEl = document.querySelector('.vue-virt-grid-main') as HTMLElement | null;
 
@@ -43,7 +43,7 @@ class InteractionTest {
 
   dropdownRender(tdData: any) {
     const app = createApp({
-      render: () => tdData.column.customCellDropdownRender?.(tdData),
+      render: () => tdData.column.customCellDropdownRender?.(tdData.column, tdData.row, tdData),
     });
     const mountEl = document.querySelector('.vue-virt-grid-main') as HTMLElement | null;
     if (mountEl) {

@@ -10,7 +10,6 @@
         cellpadding="0"
         :style="`width: ${fullWidth}px;`"
         ref="tableRefEl"
-        @mousedown="onMouseDown"
         @click="onClick"
         @dblclick="onDblclick"
         @contextmenu="onContextmenu"

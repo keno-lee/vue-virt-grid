@@ -65,20 +65,26 @@ export default defineComponent({
         column?.customCellRender ??
         gridStore.config.customCellRender;
       // 4. 走默认TextCell
-      switch (type) {
-        case CellType.Index:
-          return <IndexCell rowIndex={rowIndex} row={row} column={column}></IndexCell>;
-        case ColumnSpecType.Title:
-          return <TitleCell rowIndex={rowIndex} row={row} column={column}></TitleCell>;
-        case CellType.Checkbox:
-          return <CheckboxCell rowIndex={rowIndex} row={row} column={column}></CheckboxCell>;
-        case CellType.Radio:
-          return <RadioCell rowIndex={rowIndex} row={row} column={column}></RadioCell>;
-        case ColumnSpecType.Expand:
-          return <ExpandCell rowIndex={rowIndex} row={row} column={column}></ExpandCell>;
-        default:
-          if (customCellRender) return customCellRender(column, props.row);
-          return <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell>;
+      if (customCellRender) {
+        const renderCell = customCellRender(column, props.row);
+        if (renderCell) return renderCell;
+      } else if (type) {
+        switch (type) {
+          case CellType.Index:
+            return <IndexCell rowIndex={rowIndex} row={row} column={column}></IndexCell>;
+          case ColumnSpecType.Title:
+            return <TitleCell rowIndex={rowIndex} row={row} column={column}></TitleCell>;
+          case CellType.Checkbox:
+            return <CheckboxCell rowIndex={rowIndex} row={row} column={column}></CheckboxCell>;
+          case CellType.Radio:
+            return <RadioCell rowIndex={rowIndex} row={row} column={column}></RadioCell>;
+          case ColumnSpecType.Expand:
+            return <ExpandCell rowIndex={rowIndex} row={row} column={column}></ExpandCell>;
+          default:
+            return <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell>;
+        }
+      } else {
+        return <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell>;
       }
     };
 
