@@ -4,8 +4,10 @@
       <Grid
         :columns="columns"
         :list="list"
-        :header-row-class-name="getCustomHeaderClass"
-        :header-row-style="getCustomHeaderStyle"
+        :options="{
+          headerRowClassName: getCustomHeaderClass,
+          headerRowStyle: getCustomHeaderStyle,
+        }"
       ></Grid>
     </div>
   </div>

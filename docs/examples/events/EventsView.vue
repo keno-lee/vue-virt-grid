@@ -15,8 +15,10 @@
         @header-contextmenu="onHeaderContextmenu"
         @expand-change="onExpandChange"
         @box-selection="onBoxSelection"
-        selection
-        border
+        :options="{
+          border: true,
+          selection: true,
+        }"
       ></Grid>
     </div>
   </div>

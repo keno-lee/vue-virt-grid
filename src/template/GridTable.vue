@@ -60,6 +60,7 @@ function initColumn(columnNode: VNode) {
   const field = columnNode.props!.field as string;
   const baseProps = columnNode.props as Column;
   (Object.keys(baseProps) as (keyof Column)[]).forEach((key) => {
+    // TODO 这里为啥要赋值 boolean
     if (baseProps[key] === '') (baseProps[key] as boolean) = true;
   });
 
@@ -91,7 +92,6 @@ function initColumn(columnNode: VNode) {
   });
 
   const hasBodyRender = !columnConfig.children && !!slots.default;
-  console.log(hasBodyRender);
   if (hasBodyRender) {
     columnConfig.customCellRender = (column: Column, row: ListItem) => {
       return slots.default?.({ column, row })?.[0];

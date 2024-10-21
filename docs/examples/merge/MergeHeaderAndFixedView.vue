@@ -1,7 +1,15 @@
 <template>
   <div class="base-view">
     <div style="width: 100%; height: 600px; border: 2px solid var(--color-border)">
-      <Grid :columns="columns" :list="list" :merges="merges" border selection></Grid>
+      <Grid
+        :columns="columns"
+        :list="list"
+        :options="{
+          merges: merges,
+          border: true,
+          selection: true,
+        }"
+      ></Grid>
     </div>
   </div>
 </template>

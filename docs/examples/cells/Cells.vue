@@ -4,10 +4,12 @@
       <Grid
         :columns="columns"
         :list="list"
-        :config="customConfig"
-        border
-        highlightSelectRow
-        highlightSelectCol
+        :options="{
+          border: true,
+          showHeader: false,
+          highlightSelectRow: true,
+          ...customConfig,
+        }"
       ></Grid>
     </div>
   </div>
@@ -348,7 +350,7 @@ const columns: Column[] = [
 ];
 const list: ListItem[] = generateList(columns, 200);
 
-const customConfig = {
+const customConfig: any = {
   customCellRender: (column: Column, row: ListItem) => {
     if (column?.type === 'custom') {
       // 自定义类型

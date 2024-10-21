@@ -4,10 +4,12 @@
       <Grid
         :columns="columns"
         :list="list"
-        border
-        highlight-select-row
-        highlight-select-col
-        selection
+        :options="{
+          border: true,
+          highlightSelectRow: true,
+          highlightSelectCol: true,
+          selection: true,
+        }"
       ></Grid>
     </div>
   </div>

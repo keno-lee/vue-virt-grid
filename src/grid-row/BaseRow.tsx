@@ -63,7 +63,7 @@ export default defineComponent({
       const customCellRender =
         row[column.field]?.customCellRender ??
         column?.customCellRender ??
-        gridStore.config.customCellRender;
+        gridStore.customRender?.customCellRender;
       // 4. 走默认TextCell
       if (customCellRender) {
         const renderCell = customCellRender(column, props.row);

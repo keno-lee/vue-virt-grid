@@ -1,4 +1,4 @@
-import { reactive, shallowReactive, ref, inject } from 'vue';
+import { reactive, shallowReactive, ref, inject, provide } from 'vue';
 import {
   CellType,
   ColumnSpecType,
@@ -7,6 +7,9 @@ import {
   type MergeCell,
   type SelectedCells,
   type ColumnItem,
+  type TableOptions,
+  type CustomRender,
+  type GridProps,
 } from '@/src/type';
 import { formatColumns, type HeaderCellInfo } from '@/src/utils/column';
 import { nanoid } from 'nanoid';
@@ -15,7 +18,7 @@ import { EventEmitter } from '@/src/hooks/useEvent';
 import type { VirtListReturn } from 'vue-virt-list';
 import { GridScrollZone } from '@/src/interaction/scrollZone';
 import { useTableEvent } from '@/src/hooks/useEvent/useTableEvent';
-import { isEqual, unionWith } from 'lodash-es';
+import { assign, isEqual, merge, pick, unionWith } from 'lodash-es';
 import { getMergeInfo } from '@/src/utils/merge';
 import { InteractionTest } from './interactionTest';
 
@@ -38,6 +41,7 @@ export interface IUIProps {
   border: boolean;
   stripe: boolean;
   showTreeLine: boolean;
+  showHeader: boolean;
   selection: boolean;
 
   highlightHoverRow: boolean;
@@ -102,6 +106,35 @@ export interface IColumnsRenderInfo {
   headerCellInfo: HeaderCellInfo;
 }
 
+const defaultUIProps: IUIProps = {
+  border: false,
+  stripe: false,
+  showTreeLine: false,
+  selection: false,
+  showHeader: true,
+  highlightHoverRow: false,
+  highlightHoverCol: false,
+  highlightSelectRow: false,
+  highlightSelectCol: false,
+  defaultExpandAll: false,
+  headerRowClassName: () => '',
+  headerRowStyle: () => '',
+  headerCellClassName: () => '',
+  headerCellStyle: () => '',
+  rowClassName: () => '',
+  rowStyle: () => '',
+  cellClassName: () => '',
+  cellStyle: () => '',
+};
+
+const defaultGridOptions = {
+  rowKey: 'id',
+  rowMinHeight: 40,
+  merges: [] as MergeCell[],
+  groupConfig: [] as { columnId: string; sort: 'desc' | 'asc' }[],
+  ...defaultUIProps,
+} as Required<TableOptions>;
+
 export class GridStore {
   // 响应式数据
   watchData = reactive({
@@ -150,8 +183,6 @@ export class GridStore {
     },
   });
 
-  config: any = {};
-
   rowKey: string | number = 'id';
 
   // 非响应式
@@ -178,6 +209,7 @@ export class GridStore {
     stripe: false,
     showTreeLine: false,
     selection: false,
+    showHeader: true,
 
     highlightHoverRow: false,
     highlightHoverCol: false,
@@ -213,6 +245,8 @@ export class GridStore {
   merges = [] as MergeCell[];
   // 生成渲染合并单元格
   tempMerges = [] as MergeCell[];
+  // TODO: zhicheng 这里类型需要优化一下
+  bodyMergeMap = {} as Record<string, Record<string, MergeCell & { mergeBy: [number, number] }>>;
 
   // 原始列数据（带 _id），一般不直接用
   private originColumns = [] as ColumnItem[];
@@ -252,8 +286,13 @@ export class GridStore {
   // 交互层
   interactionTest: InteractionTest;
 
-  constructor() {
+  // TODO: 目前看是不需要响应式的，配置项传入
+  customRender: CustomRender = {};
+
+  constructor(props: { columns: Column[]; list: ListItem[]; options: TableOptions }) {
     this.interactionTest = new InteractionTest(this);
+    this.initOptions(props.options);
+    this.setColumns(props.columns);
   }
 
   // TODO 仅合并单元格模式需要计算，提升性能
@@ -610,13 +649,8 @@ export class GridStore {
     console.log('forceUpdate');
   }
 
-  setConfig(config: any) {
-    this.config = config;
-    console.log('this.config', this.config);
-  }
-
-  setMerges(merges: MergeCell[]) {
-    this.merges = merges;
+  setMerges(merges?: MergeCell[]) {
+    this.merges = merges ?? [];
   }
 
   setRowKey(key: string | number) {
@@ -689,6 +723,9 @@ export class GridStore {
     this.virtualListProps.list = list;
   }
 
+  setCustomRender(customRender: CustomRender) {
+    this.customRender = customRender;
+  }
   // setConfig(config: GridStore['watchData']['config']) {
   //   this.watchData.config = {
   //     ...this.watchData.config,
@@ -949,6 +986,27 @@ export class GridStore {
     this.resetFlatList();
   }
 
+  initOptions(options: TableOptions) {
+    const uiProps = assign(
+      {},
+      defaultUIProps,
+      pick(options, Object.keys(defaultUIProps)),
+    ) as IUIProps;
+    this.setUIProps(uiProps);
+
+    this.setRowKey(options?.rowKey ?? defaultGridOptions.rowKey);
+
+    this.setMerges(options.merges);
+
+    this.setRowMinHeight(options.rowMinHeight ?? defaultGridOptions.rowMinHeight);
+
+    this.setCustomRender({
+      customCellCoverRender: options.customCellCoverRender,
+      customCellRender: options.customCellRender,
+      customCellDropdownRender: options.customCellDropdownRender,
+    });
+  }
+
   // setUIProps<T extends keyof IUIProps>(key: T, value: IUIProps[T]) {
   //   this.uiProps[key] = value;
   // }
@@ -1135,8 +1193,60 @@ export class GridStore {
       }
     }
   }
+
+  calcVisibleColumns(scrollLeft: number, clientWidth: number) {
+    // console.log('calcVisibleColumns', scrollLeft, clientWidth);
+    let colRenderBegin = 0;
+    let colRenderEnd = 0;
+    let currentLeft = 0;
+    let beginFlag = false;
+    for (let i = 0; i < this.centerNormalColumns.length; i++) {
+      const currentWidth = this.centerNormalColumns[i].width!;
+      // console.log('currentWidth', currentLeft, scrollLeft, scrollLeft + clientWidth);
+      if (currentLeft >= scrollLeft && !beginFlag) {
+        colRenderBegin = i;
+        beginFlag = true;
+      } else if (currentLeft >= scrollLeft + clientWidth) {
+        colRenderEnd = i;
+        // console.log('计算结束', colRenderBegin, colRenderEnd);
+        break;
+      }
+      colRenderEnd = i;
+      currentLeft += currentWidth;
+    }
+    // 给首尾各加一个buffer
+    // TODO 这里可以减少点
+    colRenderBegin = Math.max(0, colRenderBegin - 1);
+    colRenderEnd = Math.min(this.centerNormalColumns.length - 1, colRenderEnd + 1);
+
+    if (
+      colRenderBegin !== this.watchData.originRect.xs ||
+      colRenderEnd !== this.watchData.originRect.xe
+    ) {
+      console.warn('横向计算结束', colRenderBegin, colRenderEnd);
+
+      this.watchData.originRect.xs = colRenderBegin;
+      this.watchData.originRect.xe = colRenderEnd;
+
+      this.calcRect(true);
+    }
+  }
+
+  initDataList(list: ListItem[]) {
+    this.setList([]);
+    setTimeout(() => {
+      this.setOriginList(list);
+      this.generateFlatList();
+    });
+  }
 }
 
-export const useGridStore = () => {
+export const useGridStore = (props?: GridProps) => {
+  if (props) {
+    // 初始化时会传入 props
+    const gridStore = new GridStore(props);
+    provide('gridStore', gridStore);
+    return gridStore;
+  }
   return inject<GridStore>('gridStore')!;
 };

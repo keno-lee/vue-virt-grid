@@ -4,8 +4,10 @@
       <Grid
         :columns="columns"
         :list="list"
-        :row-class-name="getRowClass"
-        :row-style="getRowStyle"
+        :options="{
+          rowClassName: getRowClass,
+          rowStyle: getRowStyle,
+        }"
       ></Grid>
     </div>
   </div>

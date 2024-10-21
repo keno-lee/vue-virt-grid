@@ -3,7 +3,14 @@
     <!-- <div>Column.length - {{ columns.length }}; List.length - {{ list.length }}</div> -->
     <!-- <div>Render- {{ $refs.grid.gridStore.watchData }}</div> -->
     <div style="width: 100%; height: 600px; border: 2px solid var(--color-border)">
-      <Grid ref="grid" :columns="columns" :list="list" border></Grid>
+      <Grid
+        ref="grid"
+        :columns="columns"
+        :list="list"
+        :options="{
+          border: true,
+        }"
+      ></Grid>
     </div>
   </div>
 </template>

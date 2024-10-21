@@ -1,7 +1,11 @@
 <template>
   <div class="base-view">
     <div style="width: 800px; height: 600px; border: 2px solid var(--color-border)">
-      <Grid :columns="columns" :list="list" :merges="merges" border selection></Grid>
+      <Grid
+        :columns="columns"
+        :list="list"
+        :options="{ merges: merges, border: true, selection: true }"
+      ></Grid>
       <ol style="font-size: 14px; color: rgba(0, 0, 0, 0.8); margin-top: 16px">
         <li>选中单元格后拖动快速创建区域</li>
         <li>按住command/ctrl可以选中多个区域</li>

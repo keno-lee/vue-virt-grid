@@ -2,7 +2,13 @@
   <div class="base-view">
     <div>行: {{ list.length }} 列: {{ columns.length }}</div>
     <div style="width: 100%; height: 600px; border: 2px solid var(--color-border)">
-      <Grid :columns="columns" :list="list" border></Grid>
+      <Grid
+        :columns="columns"
+        :list="list"
+        :options="{
+          border: true,
+        }"
+      ></Grid>
     </div>
   </div>
 </template>

@@ -32,10 +32,12 @@
       <Grid
         :columns="columns"
         :list="list"
-        defaultExpandAll
-        :groupConfig="groupConfig"
-        border
-        show-tree-line
+        :options="{
+          defaultExpandAll: true,
+          border: true,
+          showTreeLine: true,
+          groupConfig: groupConfig,
+        }"
       ></Grid>
     </div>
   </div>

@@ -267,3 +267,83 @@ export interface SelectedCells {
   column: Column;
   columnIndex: number;
 }
+
+export interface TableOptions {
+  rowKey?: string | number;
+  rowMinHeight?: number;
+
+  showHeader?: boolean;
+  // 树形 or 分组
+  defaultExpandAll?: boolean;
+  // 是否显示border
+  border?: boolean;
+  // 是否显示斑马纹
+  stripe?: boolean;
+  // 是否显示树形线
+  showTreeLine?: boolean;
+  // 是否支持框选
+  selection?: boolean;
+
+  highlightHoverRow?: boolean;
+  highlightHoverCol?: boolean;
+
+  // 是否高亮当前行
+  highlightSelectRow?: boolean;
+  // 是否高亮当前列
+  highlightSelectCol?: boolean;
+  // 合并单元格信息
+  merges?: MergeCell[];
+  // 分组信息
+  groupConfig?: { columnId: string; sort: 'desc' | 'asc' }[];
+  // 表头行自定义类
+  headerRowClassName?: (data: { row: Column[]; rowIndex: number }) => string;
+  // 表头行自定义样式
+  headerRowStyle?: (data: { row: Column[]; rowIndex: number }) => string;
+  // 表头单元格自定义类
+  headerCellClassName?: (data: {
+    row: Column[];
+    column: Column;
+    rowIndex: number;
+    columnIndex: number;
+  }) => string;
+  // 表头单元格自定义样式
+  headerCellStyle?: (data: {
+    row: Column[];
+    column: Column;
+    rowIndex: number;
+    columnIndex: number;
+  }) => string;
+  // 行自定义类
+  rowClassName?: (data: { row: ListItem; rowIndex: number }) => string;
+  // 行自定义样式
+  rowStyle?: (data: { row: ListItem; rowIndex: number }) => string;
+  // 单元格自定义类
+  cellClassName?: (data: {
+    row: ListItem;
+    column: Column;
+    rowIndex: number;
+    columnIndex: number;
+  }) => string;
+  // 单元格自定义样式
+  cellStyle?: (data: {
+    row: ListItem;
+    column: Column;
+    rowIndex: number;
+    columnIndex: number;
+  }) => string;
+  // 自定义单元格渲染
+  customCellRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
+  customCellCoverRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
+  customCellDropdownRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
+}
+
+export type CustomRender = Pick<
+  TableOptions,
+  'customCellRender' | 'customCellCoverRender' | 'customCellDropdownRender'
+>;
+
+export interface GridProps {
+  columns: Column[];
+  list: ListItem[];
+  options: TableOptions;
+}

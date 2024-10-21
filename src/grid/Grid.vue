@@ -25,7 +25,7 @@
           data-id="stickyHeader"
           class="vue-virt-grid-header"
           :style="`height: ${headerHeight}px;`"
-          v-if="props.showHeader"
+          v-if="gridStore.getUIProps('showHeader')"
         >
           <GridHeader></GridHeader>
         </thead>
@@ -84,7 +84,7 @@
       :class="cls.rightFixedShadow"
       :style="{ right: `${gridStore.watchData.fixedInfo.rightWidth + 16 || 0}px` }"
     ></div>
-    <div class="vue-virt-grid-mask" v-if="!list.length">
+    <div class="vue-virt-grid-mask" v-if="isEmpty">
       <slot name="empty"><p>No Data</p></slot>
     </div>
     <div class="vue-virt-grid-popper-wrapper">
@@ -95,7 +95,7 @@
 <script setup lang="tsx">
 import { onMounted, provide, ref, watch, computed, onBeforeUnmount, createApp } from 'vue';
 import { useVirtList } from 'vue-virt-list';
-import { GridStore } from '@/src/store';
+import { GridStore, useGridStore } from '@/src/store';
 import { useContentEvent } from '@/src/hooks/useEvent';
 
 import GridHeader from '@/src/grid-header/GridHeader.vue';
@@ -116,6 +116,7 @@ import {
   type MergeCell,
   TableEventEnum,
   type Column,
+  type TableOptions,
 } from '@/src/type';
 import { clearResizeLine } from '../hooks/useResizeColumn';
 import { createPopper } from '../utils/createPopper';
@@ -127,161 +128,40 @@ const props = withDefaults(
     columns: Column[];
     list: ListItem[];
 
-    config: any;
-
-    rowKey?: string | number;
-    rowMinHeight?: number;
-
-    showHeader?: boolean;
-    // 树形 or 分组
-    defaultExpandAll?: boolean;
-    // 是否显示border
-    border?: boolean;
-    // 是否显示斑马纹
-    stripe?: boolean;
-    // 是否显示树形线
-    showTreeLine?: boolean;
-    // 是否支持框选
-    selection?: boolean;
-
-    highlightHoverRow?: boolean;
-    highlightHoverCol?: boolean;
-
-    // 是否高亮当前行
-    highlightSelectRow?: boolean;
-    // 是否高亮当前列
-    highlightSelectCol?: boolean;
-    // 合并单元格信息
-    merges?: MergeCell[];
-    // 分组信息
-    groupConfig?: { columnId: string; sort: 'desc' | 'asc' }[];
-    // 表头行自定义类
-    headerRowClassName?: (data: { row: Column[]; rowIndex: number }) => string;
-    // 表头行自定义样式
-    headerRowStyle?: (data: { row: Column[]; rowIndex: number }) => string;
-    // 表头单元格自定义类
-    headerCellClassName?: (data: {
-      row: Column[];
-      column: Column;
-      rowIndex: number;
-      columnIndex: number;
-    }) => string;
-    // 表头单元格自定义样式
-    headerCellStyle?: (data: {
-      row: Column[];
-      column: Column;
-      rowIndex: number;
-      columnIndex: number;
-    }) => string;
-    // 行自定义类
-    rowClassName?: (data: { row: ListItem; rowIndex: number }) => string;
-    // 行自定义样式
-    rowStyle?: (data: { row: ListItem; rowIndex: number }) => string;
-    // 单元格自定义类
-    cellClassName?: (data: {
-      row: ListItem;
-      column: Column;
-      rowIndex: number;
-      columnIndex: number;
-    }) => string;
-    // 单元格自定义样式
-    cellStyle?: (data: {
-      row: ListItem;
-      column: Column;
-      rowIndex: number;
-      columnIndex: number;
-    }) => string;
+    options?: TableOptions;
   }>(),
   {
     columns: () => [],
     list: () => [],
 
-    rowKey: 'id',
-    rowMinHeight: 40,
-
-    showHeader: true,
-    merges: () => [],
-    // mergeMethods: null,
-    groupConfig: () => [],
-
-    // UI props
-    border: false,
-    stripe: false,
-    showTreeLine: false,
-    selection: false,
-    highlightHoverRow: false,
-    highlightHoverCol: false,
-    highlightSelectRow: false,
-    highlightSelectCol: false,
-    defaultExpandAll: false,
-    headerRowClassName: () => '',
-    headerRowStyle: () => '',
-    headerCellClassName: () => '',
-    headerCellStyle: () => '',
-    rowClassName: () => '',
-    rowStyle: () => '',
-    cellClassName: () => '',
-    cellStyle: () => '',
+    options: () => ({}),
   },
 );
 
-// 注入store
-const gridStore = new GridStore();
-provide('gridStore', gridStore);
+const gridStore = useGridStore(props);
 
-gridStore.setConfig(props.config);
+// TODO: 这里目前看只是用来判断列表是否为空
+// let list = props.list;
 
-// 在这里处理好数据，传递给GridMain
-gridStore.setUIProps({
-  border: props.border,
-  stripe: props.stripe,
-  showTreeLine: props.showTreeLine,
-  selection: props.selection,
-  highlightHoverRow: props.highlightHoverRow,
-  highlightHoverCol: props.highlightHoverCol,
-  highlightSelectRow: props.highlightSelectRow,
-  highlightSelectCol: props.highlightSelectCol,
-  defaultExpandAll: props.defaultExpandAll,
-  headerRowClassName: props.headerRowClassName,
-  headerRowStyle: props.headerRowStyle,
-  headerCellClassName: props.headerCellClassName,
-  headerCellStyle: props.headerCellStyle,
-  rowClassName: props.rowClassName,
-  rowStyle: props.rowStyle,
-  cellClassName: props.cellClassName,
-  cellStyle: props.cellStyle,
+// // TODO 分组需要再讨论一下处理方式，交由外部处理还是 grid 内部处理
+// if(props.options?.groupConfig?.length) {
+//   list = gridStore.groupFoldConstructor(props.list, props.options.groupConfig)
+// }
+
+const isEmpty = computed(() => {
+  return props.options?.groupConfig?.length
+    ? gridStore.groupFoldConstructor(props.list, props.options.groupConfig).length === 0
+    : props.list.length === 0;
 });
 
-gridStore.setRowKey(props.rowKey);
-
-gridStore.setColumns(props.columns);
-
-gridStore.setMerges(props.merges);
-
-gridStore.setRowMinHeight(props.rowMinHeight);
-
-let list = props.list;
-
-// TODO 分组需要再讨论一下处理方式，交由外部处理还是grid内部处理
-if (props.groupConfig && props.groupConfig.length) {
-  list = gridStore.groupFoldConstructor(list, props.groupConfig);
-}
-
-function initDataList(list: ListItem[]) {
-  gridStore.setList([]);
-  setTimeout(() => {
-    gridStore.setOriginList(list);
-    gridStore.generateFlatList();
-  });
-}
-
 watch(
-  () => props.groupConfig,
+  () => props.options.groupConfig,
   (nv) => {
     console.log('groupConfig', nv);
+    if (!nv) return;
     const list = gridStore.groupFoldConstructor(props.list, nv);
     console.log('groupConfig', list);
-    initDataList(list);
+    gridStore.initDataList(list);
   },
   {
     immediate: true,
@@ -293,7 +173,7 @@ watch(
 watch(
   () => props.list,
   (nv) => {
-    initDataList(nv);
+    gridStore.initDataList(nv);
   },
   {
     immediate: true,
@@ -301,45 +181,6 @@ watch(
 );
 
 const { centerNormalColumns, leftFixedColumns, rightFixedColumns } = gridStore;
-// 计算可视区域内的列
-function calcVisibleColumns(scrollLeft: number, clientWidth: number) {
-  // console.log('calcVisibleColumns', scrollLeft, clientWidth);
-  let colRenderBegin = 0;
-  let colRenderEnd = 0;
-  let currentLeft = 0;
-  let beginFlag = false;
-  for (let i = 0; i < centerNormalColumns.length; i++) {
-    const currentWidth = centerNormalColumns[i].width!;
-    // console.log('currentWidth', currentLeft, scrollLeft, scrollLeft + clientWidth);
-    if (currentLeft >= scrollLeft && !beginFlag) {
-      colRenderBegin = i;
-      beginFlag = true;
-    } else if (currentLeft >= scrollLeft + clientWidth) {
-      colRenderEnd = i;
-      // console.log('计算结束', colRenderBegin, colRenderEnd);
-      break;
-    }
-    colRenderEnd = i;
-    currentLeft += currentWidth;
-  }
-  // 给首尾各加一个buffer
-  // TODO 这里可以减少点
-  colRenderBegin = Math.max(0, colRenderBegin - 1);
-  colRenderEnd = Math.min(centerNormalColumns.length - 1, colRenderEnd + 1);
-
-  const { watchData } = gridStore;
-  if (
-    colRenderBegin !== gridStore.watchData.originRect.xs ||
-    colRenderEnd !== gridStore.watchData.originRect.xe
-  ) {
-    console.warn('横向计算结束', colRenderBegin, colRenderEnd);
-
-    watchData.originRect.xs = colRenderBegin;
-    watchData.originRect.xe = colRenderEnd;
-
-    gridStore.calcRect(true);
-  }
-}
 
 function calcFixedShadow(scrollLeft: number, scrollWidth: number, clientWidth: number) {
   gridStore.calcGridScrollingStatus(scrollLeft, scrollWidth, clientWidth);
@@ -350,7 +191,7 @@ let lastScrollTop = 0;
 const emitFunction = {
   scroll: (evt: Event) => {
     const { scrollLeft, scrollTop, scrollWidth, clientWidth } = evt.target as HTMLElement;
-    calcVisibleColumns(scrollLeft, clientWidth);
+    gridStore.calcVisibleColumns(scrollLeft, clientWidth);
     calcFixedShadow(scrollLeft, scrollWidth, clientWidth);
     // 滚动时清除列宽调整的线
     clearResizeLine();
@@ -368,7 +209,8 @@ const emitFunction = {
     // console.log('toBottom');
   },
   itemResize: (id: string, height: number) => {
-    const lastHeight = gridStore.watchData.rowHeightMap.get(String(id)) ?? props.rowMinHeight;
+    const lastHeight =
+      gridStore.watchData.rowHeightMap.get(String(id)) ?? props.options.rowMinHeight;
     gridStore.watchData.rowHeightMap.set(String(id), Math.max(lastHeight, height));
   },
 };
@@ -428,7 +270,7 @@ onMounted(() => {
   // gridStore.layoutStore.initContainer(clientRefEl.value);
   if (clientRefEl.value) {
     const { scrollLeft, scrollWidth, clientWidth } = clientRefEl.value as HTMLElement;
-    calcVisibleColumns(scrollLeft, clientWidth);
+    gridStore.calcVisibleColumns(scrollLeft, clientWidth);
     calcFixedShadow(scrollLeft, scrollWidth, clientWidth);
   }
   if (tableRefEl.value) gridStore.setTableRootEl(tableRefEl.value);

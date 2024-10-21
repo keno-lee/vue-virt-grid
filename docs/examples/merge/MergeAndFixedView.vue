@@ -1,7 +1,15 @@
 <template>
   <div class="base-view">
     <div style="width: 100%; height: 600px; border: 2px solid var(--color-border)">
-      <Grid :columns="columns" :list="list" :merges="merges" border selection></Grid>
+      <Grid
+        :columns="columns"
+        :list="list"
+        :options="{
+          merges: merges,
+          border: true,
+          selection: true,
+        }"
+      ></Grid>
     </div>
   </div>
 </template>
@@ -33,13 +41,13 @@ const generateList = (columns: ReturnType<typeof generateColumns>, length = 200,
 const normalColumns: Column[] = generateColumns(100);
 const list: ListItem[] = generateList(normalColumns, 5000);
 const columns = [
-  { type: 'index', width: 50, fixed: 'left', index: (index: number) => {} },
-  { type: 'checkbox', width: 50, fixed: 'left' },
-  { type: 'checkbox', width: 50, fixed: 'left' },
+  { type: 'index', width: 50, field: 'grid-index', fixed: 'left', index: (index: number) => {} },
+  { type: 'checkbox', width: 50, field: 'grid-checkbox-1', fixed: 'left' },
+  { type: 'checkbox', width: 50, field: 'grid-checkbox-2', fixed: 'left' },
   ...normalColumns,
-  { type: 'index', width: 50, fixed: 'right' },
-  { type: 'checkbox', width: 50, fixed: 'right' },
-];
+  { type: 'index', width: 50, field: 'grid-index-1', fixed: 'right' },
+  { type: 'checkbox', width: 50, field: 'grid-checkbox-3', fixed: 'right' },
+] as Column[];
 
 // list[1]['column-11'] =
 //   'vue-virt-grid是一个基于vue-virt-list的vue3的表格组件，支持合并单元格，虚拟滚动，固定列，固定行，树形表格';
