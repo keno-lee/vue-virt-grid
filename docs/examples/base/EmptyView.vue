@@ -12,7 +12,7 @@ const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
   Array.from({ length }).map((_, columnIndex) => ({
     ...props,
     field: `${prefix}${columnIndex}`,
-    title: `Column ${columnIndex}`,
+    title: `Title ${columnIndex}`,
     width: 200,
   }));
 

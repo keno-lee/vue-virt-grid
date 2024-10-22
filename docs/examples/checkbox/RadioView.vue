@@ -12,13 +12,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Grid, type ListItem, type Column } from 'vue-virt-grid';
+import { Grid, type ListItem, type Column, CellType } from 'vue-virt-grid';
 
 const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
   Array.from({ length }).map((_, columnIndex) => ({
     ...props,
     field: `${prefix}${columnIndex}`,
-    title: `Column ${columnIndex}`,
+    title: `Title ${columnIndex}`,
     width: 200,
   }));
 
@@ -26,7 +26,7 @@ const generateList = (columns: ReturnType<typeof generateColumns>, length = 20, 
   Array.from({ length }).map((_, rowIndex) => {
     return columns.reduce(
       (rowData, column, columnIndex) => {
-        rowData[column.field] = `Row ${rowIndex} - Col ${columnIndex}`;
+        rowData[column.field] = `Row ${rowIndex} - Field ${columnIndex}`;
         return rowData;
       },
       {
@@ -37,8 +37,8 @@ const generateList = (columns: ReturnType<typeof generateColumns>, length = 20, 
   });
 
 const columns: Column[] = [
-  { type: 'radio', width: 80, fixed: 'left', title: '单选' },
-  { type: 'radio', width: 200, fixed: 'left', title: '带label', field: 'radio' },
+  { type: CellType.Radio, width: 80, fixed: 'left', title: '单选' },
+  { type: CellType.Radio, width: 200, fixed: 'left', title: '带label', field: 'radio' },
   ...generateColumns(20),
 ];
 const list: ListItem[] = generateList(columns, 5000);

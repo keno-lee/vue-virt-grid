@@ -128,17 +128,23 @@ export const getAncestorScrollElement = (
   return scrollElement;
 };
 
-export const createPopper2 = (
-  reference: HTMLElement,
-  popperContainer: HTMLElement,
-  mountEl: HTMLElement,
-  popper: HTMLElement | App,
-  options?: Options,
-) => {
+export const createPopper = ({
+  reference,
+  mountEl,
+  popperContainer,
+  popper,
+  options,
+}: {
+  reference: HTMLElement;
+  popperContainer: HTMLElement;
+  mountEl: HTMLElement;
+  popper: HTMLElement | App;
+  options?: Options;
+}) => {
   if (!reference || !popper) {
     return;
   }
-  console.log('createPopper2', reference, popper, options);
+  console.log('createPopper', reference, popper, options);
 
   let popperEl = null;
   if (popper instanceof HTMLElement) {
@@ -148,610 +154,55 @@ export const createPopper2 = (
     popperEl = popper.mount(div).$el;
   }
 
-  const { left, top, width, height } = reference.getBoundingClientRect();
-
-  // let popperContainer: HTMLDivElement | null = null;
-  // popperContainer = document.createElement('div');
-  // popperContainer.classList.add('vue-virt-grid-popper-container');
-  // popperContainer.style.zIndex = `999`;
-  // popperContainer.style.position = 'absolute';
-
-  // if (options?.mountEl === undefined || options?.mountEl === reference) {
-  //   // 这种是基于reference的
-  //   reference.appendChild(popperContainer);
-
-  //   popperContainer.style.left = `${0}px`;
-  //   popperContainer.style.top = `${0}px`;
-  //   popperContainer.style.width = `${width - 1}px`;
-  //   popperContainer.style.height = `${height - 1}px`;
-  // } else if (options?.mountEl instanceof HTMLElement) {
-
-  // }
-
-  // 这种是基于mountEl的
-
-  // 监听父容器更新位置
-  // const scrollElements = getAncestorScrollElement(reference);
-  // console.log(scrollElements);
-
-  popperContainer.innerHTML = '';
+  const {
+    left: referenceLeft,
+    top: referenceTop,
+    width: referenceWidth,
+    height: referenceHeight,
+  } = reference.getBoundingClientRect();
+  const scrollLeft = mountEl.scrollLeft;
+  const scrollTop = mountEl.scrollTop;
 
   const {
     left: mountElLeft,
     top: mountElTop,
+    right: mountElRight,
+    bottom: mountElBottom,
     width: mountElWidth,
     height: mountElHeight,
   } = mountEl.getBoundingClientRect();
 
+  popperContainer.innerHTML = '';
   if (options?.placement === 'bottom-start') {
-    popperContainer.style.left = `${left - mountElLeft - 1}px`;
-    popperContainer.style.top = `${top - mountElTop + height + 2}px`;
+    popperContainer.style.left = `${referenceLeft - mountElLeft + scrollLeft - 2}px`;
+    popperContainer.style.top = `${referenceTop - mountElTop + referenceHeight + scrollTop + 2}px`;
     // popperContainer.style.width = `${width - 1}px`;
     // popperContainer.style.height = `${height - 1}px`;
+
+    // TODO 检测越界
+    console.log('检测越界', mountEl.getBoundingClientRect());
   } else {
-    popperContainer.style.left = `${left - mountElLeft - 1}px`;
-    popperContainer.style.top = `${top - mountElTop - 1}px`;
-    popperContainer.style.width = `${width - 1}px`;
-    popperContainer.style.height = `${height - 1}px`;
+    // center
+    popperContainer.style.left = `${referenceLeft - mountElLeft + scrollLeft - 1}px`;
+    popperContainer.style.top = `${referenceTop - mountElTop + scrollTop - 1}px`;
+    popperContainer.style.width = `${referenceWidth - 1}px`;
+    popperContainer.style.height = `${referenceHeight - 1}px`;
   }
 
   mountEl.appendChild(popperContainer);
   popperContainer.appendChild(popperEl);
-};
 
-export const createPopper = (
-  reference?: HTMLElement | IVirtualElement,
-  popper?: HTMLElement | App,
-  customOptions?: Options,
-): ILmsPopper => {
-  console.log('createPopper', reference, popper, customOptions);
-  if (!reference || !popper) {
-    return { close: onError, updatePopper: onError, destroy: onError };
-  }
-
-  let popperEl = null;
-  let popperContainer: HTMLDivElement | null = null;
-  let arrowEl: HTMLDivElement | null = null;
-  let resizeObserver: ResizeObserver | null = null;
-  const isHTMLReference = isHTMLElement(reference);
-  const options: Options = {
-    placement: 'bottom',
-    offset: [0, 0],
-    scrollTrigger: isHTMLReference ? reference : undefined,
-    overflowTrigger: undefined,
-    beforeClose: undefined,
-    mounted: undefined,
-    popperClass: '',
-    onEnter: undefined,
-    onOver: undefined,
-    onLeave: undefined,
-    showArrow: true,
-    manual: false,
-    padding: [0, 0],
-    allowOverflow: false,
-    followScroll: false,
-    mountEl: document.body,
-    zIndex: undefined,
-    autoAdjustAlign: true,
-  };
-
-  Object.assign(options, customOptions);
-  const beforeClose = options.beforeClose || null;
-  const mounted = options.mounted || null;
-  const onEnter = options.onEnter || null;
-  const onOver = options.onOver || null;
-  const onLeave = options.onLeave || null;
-  const onOverflow = options.onOverflow || null;
-  const onInView = options.onInView || null;
-  const originOffset = options.offset ?? [0, 0];
-  const offset = [0, 0];
-  const manual = options.manual || false;
-  const overflowTrigger = options.overflowTrigger || options.mountEl;
-  const followScroll = options.followScroll || false;
-  const zIndex = options.zIndex ?? 1;
-  const autoAdjustAlign = options.autoAdjustAlign ?? true;
-
-  if (popper instanceof HTMLElement) {
-    popperEl = popper;
-  } else {
-    const div = document.createElement('div');
-    popperEl = popper.mount(div).$el;
-  }
-
-  if (mounted) {
-    mounted(popperEl);
-  }
-
-  const destroy = () => {
-    if (popper instanceof HTMLElement) {
-      popper.remove();
-    } else {
-      popper.unmount();
-    }
-    removeListener();
-    popperContainer?.remove();
-    popperContainer = null;
-  };
-
-  const close = () => {
-    if (beforeClose) {
-      beforeClose();
-    }
-    destroy();
-  };
-
-  const mouseEnter = (e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onEnter) {
-      onEnter();
-    }
-  };
-
-  const mouseLeave = (e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onLeave) {
-      onLeave();
-    }
-  };
-
-  const mouseOver = (e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onOver) {
-      onOver();
-    }
-  };
-
-  const listenerCloseTrigger = (evt: MouseEvent) => {
-    const target = (evt.composedPath() as HTMLElement[]).find(
-      (ele: HTMLElement) =>
-        ele?.classList?.contains('lms-popper') || ele?.hasAttribute?.('lms-popper-disable-close'),
-    );
-    // 只要点击不包含当前弹窗内容就关闭弹窗
-    if (!target) {
-      close();
-    }
-  };
-
-  const addListener = () => {
-    // observer.observe(reference);
-    addScrollListener();
-    addResizeListener();
-    if (!manual) {
-      document.addEventListener('click', listenerCloseTrigger, true);
-      if (popperContainer) {
-        popperContainer.addEventListener('mouseenter', mouseEnter, false);
-        popperContainer.addEventListener('mouseleave', mouseLeave, false);
-        popperContainer.addEventListener('mouseover', mouseOver, false);
-      }
-    }
-  };
-
-  const removeListener = () => {
-    // observer.unobserve(reference);
-    removeScrollListener();
-    removeResizeListener();
-    if (!manual) {
-      document.removeEventListener('click', listenerCloseTrigger, true);
-      if (popperContainer) {
-        popperContainer.removeEventListener('mouseenter', mouseEnter, false);
-        popperContainer.removeEventListener('mouseleave', mouseLeave, false);
-        popperContainer.removeEventListener('mouseover', mouseOver, false);
-      }
-    }
-  };
-
-  const scrollEvent = (e: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-    updatePopperByScroll(e);
-  };
-
-  let lastScrollLeft = 0;
-  let lastScrollTop = 0;
-  function updatePopperByScroll(e: Event) {
-    console.log('updatePopperByScroll', e);
-
-    const left = (e.target as HTMLElement).scrollLeft - lastScrollLeft;
-    const top = (e.target as HTMLElement).scrollTop - lastScrollTop;
-    if (!popperContainer) return;
-
-    const lastLeft = Number(popperContainer.style.left.match(/-?[0-9]+/)?.[0] ?? 0);
-    const lastTop = Number(popperContainer.style.top.match(/-?[0-9]+/)?.[0] ?? 0);
-
-    popperContainer.style.left = `${lastLeft - left}px`;
-    popperContainer.style.top = `${lastTop - top}px`;
-
-    lastScrollLeft = (e.target as HTMLElement).scrollLeft;
-    lastScrollTop = (e.target as HTMLElement).scrollTop;
-  }
-
-  const addScrollListener = () => {
-    let trigger: HTMLElement | null | undefined = options.scrollTrigger;
-    trigger = trigger?.parentElement;
-    while (trigger) {
-      trigger.addEventListener('scroll', scrollEvent, false);
-      trigger = trigger.parentElement;
-    }
-  };
-
-  const removeScrollListener = () => {
-    let trigger: HTMLElement | null | undefined = options.scrollTrigger;
-    trigger = trigger?.parentElement;
-    while (trigger) {
-      trigger.removeEventListener('scroll', scrollEvent, false);
-      trigger = trigger.parentElement;
-    }
-  };
-
-  const resizeEvent = () => {
-    calculateWidth();
-    updatePopper();
-  };
-
-  const addResizeListener = () => {
-    resizeObserver?.disconnect();
-    resizeObserver = null;
-    resizeObserver = new ResizeObserver(resizeEvent);
-    if (options.mountEl) {
-      resizeObserver.observe(options.mountEl);
-    }
-    if (overflowTrigger && overflowTrigger !== options.mountEl) {
-      resizeObserver.observe(overflowTrigger);
-    }
-    if (isHTMLReference) {
-      resizeObserver.observe(reference);
-    }
-  };
-
-  const removeResizeListener = () => {
-    resizeObserver?.disconnect();
-    resizeObserver = null;
-  };
-
-  const calculateWidth = () => {
-    if (!popperContainer) return;
-    if (options.autoWidth) {
-      const { width: referenceWidth } = reference.getBoundingClientRect() as DOMRect;
-      popperContainer.style.width = `${referenceWidth - 2}px`;
-    } else if (options.width) {
-      popperContainer.style.width =
-        typeof options.width === 'number' ? `${options.width}px` : options.width;
-    }
-
-    if (options.autoHeight) {
-      const { height: referenceHeight } = reference.getBoundingClientRect() as DOMRect;
-      popperContainer.style.height = `${referenceHeight - 1}px`;
-    }
-  };
-
-  // popperjs
-  function getMainAxisFromPlacement(placement: Placement): 'x' | 'y' {
-    return ['top', 'bottom'].includes(getSide(placement)) ? 'x' : 'y';
-  }
-
-  // popperjs
-  function getSide(placement: Placement): 'top' | 'left' | 'bottom' | 'right' | 'center' {
-    return placement.split('-')[0] as 'top' | 'left' | 'bottom' | 'right' | 'center';
-  }
-
-  // popperjs
-  function getLengthFromAxis(axis: 'x' | 'y'): 'width' | 'height' {
-    return axis === 'y' ? 'height' : 'width';
-  }
-
-  // popperjs
-  function getAlignment(placement: string): 'start' | 'end' {
-    return placement.split('-')[1] as 'start' | 'end';
-  }
-
-  // popperjs
-  const computeCoordsFromPlacement = (
-    rects: { ref: ElementRect; float: ElementRect },
-    placement: Placement,
-    rtl?: boolean,
-  ): { x: number; y: number } => {
-    const [offsetX, offsetY] = offset;
-    const { ref, float } = rects;
-    const commonX = ref.x + ref.width / 2 - float.width / 2;
-    const commonY = ref.y + ref.height / 2 - float.height / 2;
-    const mainAxis = getMainAxisFromPlacement(placement);
-    const length = getLengthFromAxis(mainAxis);
-    const commonAlign = ref[length] / 2 - float[length] / 2;
-    const isVertical = mainAxis === 'x';
-
-    let coords;
-    switch (getSide(placement)) {
-      case 'top':
-        coords = { x: commonX, y: ref.y - float.height };
-        break;
-      case 'bottom':
-        coords = { x: commonX, y: ref.y + ref.height };
-        break;
-      case 'right':
-        coords = { x: ref.x + ref.width, y: commonY };
-        break;
-      case 'left':
-        coords = { x: ref.x - float.width, y: commonY };
-        break;
-      default:
-        coords = { x: ref.x, y: ref.y };
-    }
-
-    switch (getAlignment(placement)) {
-      case 'start':
-        coords[mainAxis] -= commonAlign * (rtl && isVertical ? -1 : 1);
-        break;
-      case 'end':
-        coords[mainAxis] += commonAlign * (rtl && isVertical ? -1 : 1);
-        break;
-      default:
-    }
-
-    coords.x += offsetX;
-    coords.y += offsetY;
-
-    return coords;
-  };
-
-  // 更新位置
-  const updatePopper = () => {
-    // 触发节点从页面上移除时关闭弹窗
-    if (isHTMLReference && !document.body.contains(reference)) {
-      close();
-      return;
-    }
-
-    if (!popperContainer || !reference || !overflowTrigger) {
-      return;
-    }
-
-    const referenceRect = reference.getBoundingClientRect() as DOMRect;
-
-    // 如果reference不存在页面上，关闭弹窗
-    if (!referenceRect) {
-      close();
-      return;
-    }
-
-    const popperRect = popperContainer.getBoundingClientRect() as DOMRect;
-    const overflowRect = (overflowTrigger as HTMLElement).getBoundingClientRect();
-    const mountRect = (options.mountEl as HTMLElement).getBoundingClientRect();
-    const { scrollLeft, scrollTop } = options.mountEl as HTMLElement;
-    const mountElStyle = window.getComputedStyle(options.mountEl as HTMLElement);
-
-    const {
-      x: referenceX,
-      y: referenceY,
-      width: referenceWidth,
-      height: referenceHeight,
-    } = referenceRect;
-    const { width: popperWidth, height: popperHeight } = popperRect;
-    const {
-      x: overflowContainerX,
-      y: overflowContainerY,
-      width: overflowContainerWidth,
-      height: overflowContainerHeight,
-    } = overflowRect;
-    const { x: mountContainerX, y: mountContainerY } = mountRect;
-
-    const mountContainerBorderX = parseFloat(mountElStyle.getPropertyValue('border-left-width'));
-    const mountContainerBorderY = parseFloat(mountElStyle.getPropertyValue('border-top-width'));
-
-    let { placement = 'bottom' } = options;
-    const side = getSide(placement);
-    const alignment = getAlignment(placement);
-
-    const adjustXAlignment = () => {
-      switch (alignment) {
-        case 'start':
-          if (referenceX + popperWidth > overflowContainerX + overflowContainerWidth) {
-            return 'end';
-          }
-          break;
-        case 'end':
-          if (referenceX + referenceWidth - popperWidth < overflowContainerX) {
-            return 'start';
-          }
-          break;
-      }
-      return alignment;
-    };
-
-    const adjustYAlignment = () => {
-      switch (alignment) {
-        case 'start':
-          if (referenceY + popperHeight > overflowContainerY + overflowContainerHeight) {
-            return 'end';
-          }
-          break;
-        case 'end':
-          if (referenceY + referenceHeight - popperHeight < overflowContainerY) {
-            return 'start';
-          }
-          break;
-      }
-      return alignment;
-    };
-
-    const adjustSide = () => {
-      const [ox, oy] = originOffset;
-      offset[0] = ox;
-      offset[1] = oy;
-      switch (side) {
-        case 'bottom':
-          if (
-            referenceY + referenceHeight + popperHeight >
-            overflowContainerHeight + overflowContainerY
-          ) {
-            offset[1] = -oy;
-            return 'top';
-          }
-          break;
-        case 'top':
-          if (referenceY - popperHeight < overflowContainerY) {
-            offset[1] = -oy;
-            return 'bottom';
-          }
-          break;
-        case 'left':
-          if (referenceX - popperWidth < overflowContainerX) {
-            offset[0] = -ox;
-            return 'right';
-          }
-          break;
-        case 'right':
-          if (
-            referenceX + referenceWidth + popperWidth >
-            overflowContainerX + overflowContainerWidth
-          ) {
-            offset[0] = -ox;
-            return 'left';
-          }
-          break;
-        default:
-          break;
-      }
-      return side;
-    };
-
-    if (autoAdjustAlign) {
-      placement = placement.replace(side, adjustSide()) as Placement;
-
-      if (getMainAxisFromPlacement(placement) === 'x') {
-        placement = placement.replace(alignment, adjustXAlignment()) as Placement;
-      } else {
-        placement = placement.replace(alignment, adjustYAlignment()) as Placement;
-      }
-    }
-
-    const { x, y } = computeCoordsFromPlacement(
-      {
-        ref: {
-          x: referenceX,
-          y: referenceY,
-          width: referenceWidth,
-          height: referenceHeight,
-        },
-        float: {
-          x: 0,
-          y: 0,
-          width: popperWidth,
-          height: popperHeight,
-        },
-      },
-      placement,
-    );
-
-    if (popperContainer) {
-      const padding = options.padding || [0, 0];
-      const { allowOverflow } = options;
-      const nonOverflowX = Math.max(
-        overflowContainerX + padding[0],
-        Math.min(overflowContainerX + overflowContainerWidth - padding[0] - popperWidth, x),
-      );
-      const nonOverflowY = Math.max(
-        overflowContainerY + padding[1],
-        Math.min(overflowContainerY + overflowContainerHeight - padding[1] - popperHeight, y),
-      );
-      const popperX = Math.round(
-        (allowOverflow ? x : nonOverflowX) -
-          mountContainerX -
-          mountContainerBorderX +
-          (followScroll ? 0 : scrollLeft),
-      );
-      const popperY = Math.round(
-        (allowOverflow ? y : nonOverflowY) -
-          mountContainerY -
-          mountContainerBorderY +
-          (followScroll ? 0 : scrollTop),
-      );
-
-      popperContainer.style.left = `${popperX}px`;
-      popperContainer.style.top = `${popperY}px`;
-      popperContainer.setAttribute('x-placement', placement);
-
-      if (arrowEl) {
-        const refX = referenceX - mountContainerX - mountContainerBorderX;
-        const refY = referenceY - mountContainerY - mountContainerBorderY;
-        const RATE = 0.1;
-        const OFFSET = 6;
-        let left = 0;
-        let top = 0;
-        if (placement.includes('start')) {
-          left = Math.max(0, refX - popperX) + RATE * Math.min(referenceWidth, popperWidth);
-          top = Math.max(0, refY - popperY) + RATE * Math.min(referenceHeight, popperHeight);
-        } else if (placement.includes('end')) {
-          left =
-            Math.max(0, refX - popperX) +
-            (1 - RATE) * Math.min(referenceWidth, popperWidth) -
-            OFFSET * 2;
-          top =
-            Math.max(0, refY - popperY) +
-            (1 - RATE) * Math.min(referenceHeight, popperHeight) -
-            OFFSET * 2;
-        } else {
-          left = Math.max(0, refX - popperX) + 0.5 * Math.min(referenceWidth, popperWidth) - OFFSET;
-          top =
-            Math.max(0, refY - popperY) + 0.5 * Math.min(referenceHeight, popperHeight) - OFFSET;
-        }
-
-        if (placement.includes('top') || placement.includes('bottom')) {
-          arrowEl.style.left = `${left}px`;
-        } else {
-          arrowEl.style.top = `${top}px`;
-        }
-      }
-
-      if (!options.allowOverflow) {
-        if (x !== nonOverflowX || y !== nonOverflowY) {
-          onOverflow?.();
-        } else {
-          onInView?.();
-        }
-      }
-    }
-  };
-
-  popperContainer = document.createElement('div');
-  popperContainer.classList.add('hyd-popper');
-  popperContainer.style.zIndex = `${zIndex}`;
-  calculateWidth();
-  if (options.popperClass) {
-    const regex = /[\w-]+/g;
-    const result = (options.popperClass || '').match(regex);
-    if (result) popperContainer.classList.add(...result);
-  }
-
-  if (options.showArrow) {
-    arrowEl = document.createElement('div');
-    arrowEl.classList.add('popper__arrow');
-    popperContainer.appendChild(arrowEl);
-  }
-
-  // 先要挂载，然后才能获取大小
-  if (popperEl) popperContainer.appendChild(popperEl);
-
-  // 如果有容器，则挂载在容器下方
-  if (options.mountEl) {
-    options.mountEl.appendChild(popperContainer);
-  } else if (isHTMLReference) {
-    reference.appendChild(popperContainer);
-  }
-
-  updatePopper();
-
-  // 延迟绑定
+  // 移除popper
   setTimeout(() => {
-    addListener();
+    document.addEventListener('click', (evt: MouseEvent) => {
+      const popper = (evt.composedPath() as HTMLElement[]).find(
+        (el: HTMLElement) =>
+          el?.classList?.contains('vue-virt-grid-popper-container') ||
+          el?.classList?.contains('vue-virt-grid-td'),
+      );
+      if (!popper) {
+        mountEl.removeChild(popperContainer);
+      }
+    });
   }, 0);
-
-  return {
-    close,
-    destroy,
-    updatePopper,
-    popperElement: popperContainer,
-  };
 };

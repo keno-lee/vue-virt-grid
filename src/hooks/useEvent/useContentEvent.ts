@@ -1,7 +1,5 @@
 import type { GridStore } from '@/src/store';
 import { CellEventEnum, RowEventEnum, HeaderEventEnum, type Column } from '@/src/type';
-import { createPopper, createPopper2 } from '@/src/popper/popper';
-import { createApp } from 'vue';
 
 /**
  * @desc 检查并获取表头信息
@@ -72,8 +70,9 @@ export const useContentEvent = (gridStore: GridStore) => {
       gridStore.eventEmitter.emit(CellEventEnum.CellClick, tdData);
       gridStore.eventEmitter.emit(RowEventEnum.RowClick, tdData);
 
-      gridStore.interactionTest.remove();
-      gridStore.interactionTest.coverRender(tdData);
+      gridStore.popperStore.remove();
+
+      gridStore.popperStore.coverRender(tdData);
     }
   };
   const onDblclick = (e: MouseEvent) => {
@@ -91,30 +90,7 @@ export const useContentEvent = (gridStore: GridStore) => {
       gridStore.eventEmitter.emit(RowEventEnum.RowDblclick, tdData);
 
       // 双击
-      console.log('dblclick', tdData);
-      // gridStore.interactionTest.dropdownRender(tdData);
-      // if (tdData.column.customCellDropdownRender !== undefined) {
-      //   const app = createApp({
-      //     render: () => tdData.column.customCellDropdownRender?.(),
-      //   });
-      //   const mountEl = document.querySelector('.vue-virt-grid-main') as HTMLElement | null;
-      //   if (mountEl) {
-      //     createPopper2(tdData.el, app, {
-      //       // autoWidth: true,
-      //       // autoHeight: true,
-      //       placement: 'bottom-start',
-      //       mountEl: mountEl,
-      //     });
-      //   }
-      // }
-      // gridStore.dropdownEl.style.zIndex = '999';
-      // gridStore.dropdownEl.style.position = 'absolute';
-      // gridStore.dropdownEl.style.left = '0px';
-      // gridStore.dropdownEl.style.top = `${tdData.rect.height + 4}px`;
-      // // gridStore.dropdownEl.style.width = `${tdData.rect.width - 1}px`;
-      // // gridStore.dropdownEl.style.height = `${tdData.rect.height - 1}px`;
-      // createPopper(tdData.el, tdData.column.customCellDropdownRender, gridStore.dropdownEl);
-      // tdData.el.append(gridStore.dropdownEl);
+      // console.log('dblclick', tdData);
     }
   };
   const onContextmenu = (e: MouseEvent) => {

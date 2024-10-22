@@ -20,7 +20,7 @@ const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
   Array.from({ length }).map((_, columnIndex) => ({
     ...props,
     field: `${prefix}${columnIndex}`,
-    title: `Column ${columnIndex}`,
+    title: `Title ${columnIndex}`,
     width: 200,
     align: 'center',
     headerAlign: 'right',
@@ -31,7 +31,7 @@ const generateList = (columns: ReturnType<typeof generateColumns>, length = 200,
   Array.from({ length }).map((_, rowIndex) => {
     return columns.reduce(
       (rowData, column, columnIndex) => {
-        rowData[column.field] = `Row ${rowIndex} - Col ${columnIndex}`;
+        rowData[column.field] = `Row ${rowIndex} - Field ${columnIndex}`;
         return rowData;
       },
       {
@@ -53,13 +53,13 @@ const columns: Column[] = [
       return <div>{column.field}</div>;
     },
     // 方式1
-    // customCellRender: (column: Column, row: ListItem) => {
-    //   console.log('customCellRender', column, row);
+    // cellRender: (column: Column, row: ListItem) => {
+    //   console.log('cellRender', column, row);
     //   return <div>{row[column.field]}</div>;
     // },
     // 方式2
-    customCellRender: (column: Column, row: ListItem) => {
-      // console.log('customCellRender', column, row);
+    cellRender: (column: Column, row: ListItem) => {
+      // console.log('cellRender', column, row);
       return <CustomCell column={column} row={row}></CustomCell>;
     },
   },

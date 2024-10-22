@@ -31,6 +31,6 @@ const props = withDefaults(
 
 const { itemRefEl } = useObserverItem({ resizeObserver: props.resizeObserver as ResizeObserver });
 const getRenderRow = (row: ListItem) => {
-  return expandCol.value?.customCellRender?.(expandCol.value, row);
+  return expandCol.value?.expandRender?.(expandCol.value, row);
 };
 </script>

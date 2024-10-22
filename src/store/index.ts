@@ -1,7 +1,6 @@
 import { reactive, shallowReactive, ref, inject, provide } from 'vue';
 import {
   CellType,
-  ColumnSpecType,
   type Column,
   type ListItem,
   type MergeCell,
@@ -20,7 +19,7 @@ import { GridScrollZone } from '@/src/interaction/scrollZone';
 import { useTableEvent } from '@/src/hooks/useEvent/useTableEvent';
 import { assign, isEqual, merge, pick, unionWith } from 'lodash-es';
 import { getMergeInfo } from '@/src/utils/merge';
-import { InteractionTest } from './interactionTest';
+import { PopperStore } from './popperStore';
 
 export type MergeInfoMap = Record<
   number,
@@ -284,13 +283,13 @@ export class GridStore {
   eventEmitter = new EventEmitter();
 
   // 交互层
-  interactionTest: InteractionTest;
+  popperStore: PopperStore;
 
   // TODO: 目前看是不需要响应式的，配置项传入
   customRender: CustomRender = {};
 
   constructor(props: { columns: Column[]; list: ListItem[]; options: TableOptions }) {
-    this.interactionTest = new InteractionTest(this);
+    this.popperStore = new PopperStore(this);
     this.initOptions(props.options);
     this.setColumns(props.columns);
   }
@@ -304,7 +303,7 @@ export class GridStore {
       return { ys: this.watchData.originRect.ys, ye: this.watchData.originRect.ye };
     }
 
-    console.time('calcRect');
+    // console.time('calcRect');
     const topMerges: any = [];
     const leftMerges: any = [];
     const rightMerges: any = [];
@@ -781,7 +780,7 @@ export class GridStore {
 
     const { foldMap, expandMap } = this.watchData;
 
-    const hasExpandCol = !!this.flattedColumns.find((col) => col.type === ColumnSpecType.Expand);
+    const hasExpandCol = !!this.flattedColumns.find((col) => col.type === CellType.Expand);
 
     const defaultExpandAll = this.getUIProps('defaultExpandAll');
 
@@ -1001,9 +1000,9 @@ export class GridStore {
     this.setRowMinHeight(options.rowMinHeight ?? defaultGridOptions.rowMinHeight);
 
     this.setCustomRender({
-      customCellCoverRender: options.customCellCoverRender,
-      customCellRender: options.customCellRender,
-      customCellDropdownRender: options.customCellDropdownRender,
+      cellCoverRender: options.cellCoverRender,
+      cellRender: options.cellRender,
+      cellDropdownRender: options.cellDropdownRender,
     });
   }
 
@@ -1142,7 +1141,7 @@ export class GridStore {
     const colIndex = column.colIndex;
     const type = column.type;
 
-    if (type === ColumnSpecType.Expand || type === CellType.Index || type === CellType.Checkbox) {
+    if (type === CellType.Expand || type === CellType.Index || type === CellType.Checkbox) {
       return 'vue-virt-grid-cell--unselectable';
     }
 

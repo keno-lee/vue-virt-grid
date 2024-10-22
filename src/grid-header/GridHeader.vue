@@ -107,7 +107,7 @@ const centerColumnsInfo = computed(() => {
     }
   }
 
-  console.log('centerColumnsInfo =======================', centerColumnsInfo);
+  // console.log('centerColumnsInfo =======================', centerColumnsInfo);
   return centerColumnsInfo;
 });
 </script>

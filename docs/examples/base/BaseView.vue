@@ -12,7 +12,7 @@ const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
   Array.from({ length }).map((_, columnIndex) => ({
     ...props,
     field: `${prefix}${columnIndex}`,
-    title: `Column ${columnIndex}`,
+    title: `Title ${columnIndex}`,
     width: 200,
   }));
 
@@ -20,7 +20,7 @@ const generateList = (columns: ReturnType<typeof generateColumns>, length = 200,
   Array.from({ length }).map((_, rowIndex) => {
     return columns.reduce(
       (rowData, column, columnIndex) => {
-        rowData[column.field] = `Row ${rowIndex} - Col ${columnIndex}`;
+        rowData[column.field] = `Row ${rowIndex} - Field ${columnIndex}`;
         return rowData;
       },
       {
@@ -31,6 +31,7 @@ const generateList = (columns: ReturnType<typeof generateColumns>, length = 200,
   });
 
 const columns: Column[] = [...generateColumns(10)];
+columns[0].type = 'title';
 const list: ListItem[] = generateList(columns, 20);
 </script>
 <style lang="scss">

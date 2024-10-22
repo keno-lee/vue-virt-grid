@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-virt-grid-popper-cell vue-virt-grid-cell__select-dropdown">select</div>
+  <div class="vue-virt-grid-cell__date-dropdown">时间选择器</div>
 </template>
 <script setup lang="tsx">
 import { type PropType } from 'vue';
@@ -22,19 +22,12 @@ const props = defineProps({
 </script>
 
 <style lang="scss">
-.vue-virt-grid-cell__select-dropdown {
-  // position: absolute;
-  // top: 44px;
-  // left: 0;
-  // width: 300px;
-  // height: 200px;
-  // border-radius: 4px;
-  // background-color: #fff;
-  // box-shadow: 0 8px 16px rgba(31, 35, 41, 0.1);
-  // border: 1px solid #ccc;
-  width: 200px;
+.vue-virt-grid-cell__date-dropdown {
+  width: 220px;
   height: 300px;
-  background-color: cyan;
+  border-radius: 4px;
+  background-color: #fff;
   box-shadow: 0 8px 16px rgba(31, 35, 41, 0.1);
+  border: 1px solid #dee0e3;
 }
 </style>

@@ -93,7 +93,7 @@ function initColumn(columnNode: VNode) {
 
   const hasBodyRender = !columnConfig.children && !!slots.default;
   if (hasBodyRender) {
-    columnConfig.customCellRender = (column: Column, row: ListItem) => {
+    columnConfig.cellRender = (column: Column, row: ListItem) => {
       return slots.default?.({ column, row })?.[0];
     };
   }

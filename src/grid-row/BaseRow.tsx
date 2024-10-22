@@ -1,9 +1,9 @@
 import { computed, defineComponent, type PropType } from 'vue';
 import { useGridStore } from '@/src/store';
-import { CellType, ColumnSpecType, type ColumnItem, type ListItem } from '@/src/type';
+import { CellType, type ColumnItem, type ListItem } from '@/src/type';
 import { getMergeInfo } from '@/src/utils/merge';
 import { useObserverItem } from 'vue-virt-list';
-import TitleCell from '@/src/grid-cell/TitleCell.vue';
+import TreeCell from '@/src/grid-cell/TreeCell.vue';
 import TextCell from '@/src/grid-cell/TextCell.vue';
 import IndexCell from '@/src/grid-cell/IndexCell.vue';
 import CheckboxCell from '@/src/grid-cell/CheckboxCell.vue';
@@ -56,30 +56,28 @@ export default defineComponent({
       rowIndex: number;
       column: ColumnItem;
     }) => {
-      // 1. 判断cell是否存在自定义渲染 customCellRender
-      // 2. 判断columns是否存在自定义渲染 customCellRender
-      // 3. 判断全局自定义渲染函数 customCellRender
+      // 1. 判断cell是否存在自定义渲染 cellRender
+      // 2. 判断columns是否存在自定义渲染 cellRender
+      // 3. 判断全局自定义渲染函数 cellRender
       const type = row[column.field]?.type ?? column?.type;
-      const customCellRender =
-        row[column.field]?.customCellRender ??
-        column?.customCellRender ??
-        gridStore.customRender?.customCellRender;
+      const cellRender =
+        row[column.field]?.cellRender ?? column?.cellRender ?? gridStore.customRender?.cellRender;
       // 4. 走默认TextCell
-      if (customCellRender) {
-        const renderCell = customCellRender(column, props.row);
+      if (cellRender) {
+        const renderCell = cellRender(column, props.row);
         if (renderCell) return renderCell;
       } else if (type) {
         switch (type) {
           case CellType.Index:
             return <IndexCell rowIndex={rowIndex} row={row} column={column}></IndexCell>;
-          case ColumnSpecType.Title:
-            return <TitleCell rowIndex={rowIndex} row={row} column={column}></TitleCell>;
+          case CellType.Tree:
+            return <TreeCell rowIndex={rowIndex} row={row} column={column}></TreeCell>;
+          case CellType.Expand:
+            return <ExpandCell rowIndex={rowIndex} row={row} column={column}></ExpandCell>;
           case CellType.Checkbox:
             return <CheckboxCell rowIndex={rowIndex} row={row} column={column}></CheckboxCell>;
           case CellType.Radio:
             return <RadioCell rowIndex={rowIndex} row={row} column={column}></RadioCell>;
-          case ColumnSpecType.Expand:
-            return <ExpandCell rowIndex={rowIndex} row={row} column={column}></ExpandCell>;
           default:
             return <TextCell rowIndex={rowIndex} row={row} column={column}></TextCell>;
         }

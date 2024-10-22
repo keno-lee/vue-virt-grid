@@ -87,9 +87,6 @@
     <div class="vue-virt-grid-mask" v-if="isEmpty">
       <slot name="empty"><p>No Data</p></slot>
     </div>
-    <div class="vue-virt-grid-popper-wrapper">
-      <div class="vue-virt-grid-popper"></div>
-    </div>
   </div>
 </template>
 <script setup lang="tsx">
@@ -119,7 +116,6 @@ import {
   type TableOptions,
 } from '@/src/type';
 import { clearResizeLine } from '../hooks/useResizeColumn';
-import { createPopper } from '../utils/createPopper';
 
 const emits = defineEmits<CellEmits & RowEmits & HeaderEmits & TableEmits>();
 
@@ -148,6 +144,7 @@ const gridStore = useGridStore(props);
 //   list = gridStore.groupFoldConstructor(props.list, props.options.groupConfig)
 // }
 
+// 如果有分组优先判断分组信息
 const isEmpty = computed(() => {
   return props.options?.groupConfig?.length
     ? gridStore.groupFoldConstructor(props.list, props.options.groupConfig).length === 0
@@ -186,8 +183,6 @@ function calcFixedShadow(scrollLeft: number, scrollWidth: number, clientWidth: n
   gridStore.calcGridScrollingStatus(scrollLeft, scrollWidth, clientWidth);
 }
 
-let lastScrollLeft = 0;
-let lastScrollTop = 0;
 const emitFunction = {
   scroll: (evt: Event) => {
     const { scrollLeft, scrollTop, scrollWidth, clientWidth } = evt.target as HTMLElement;
@@ -195,24 +190,14 @@ const emitFunction = {
     calcFixedShadow(scrollLeft, scrollWidth, clientWidth);
     // 滚动时清除列宽调整的线
     clearResizeLine();
-
-    console.log('scroll', scrollLeft, scrollTop - lastScrollTop);
-    updatePopperPosition(scrollLeft - lastScrollLeft, scrollTop - lastScrollTop);
-
-    lastScrollLeft = scrollLeft;
-    lastScrollTop = scrollTop;
-  },
-  toTop: () => {
-    // console.log('toTop');
-  },
-  toBottom: () => {
-    // console.log('toBottom');
   },
   itemResize: (id: string, height: number) => {
     const lastHeight =
       gridStore.watchData.rowHeightMap.get(String(id)) ?? props.options.rowMinHeight;
     gridStore.watchData.rowHeightMap.set(String(id), Math.max(lastHeight, height));
   },
+  toTop: () => {},
+  toBottom: () => {},
 };
 
 const virtualListRef = useVirtList(gridStore.virtualListProps, emitFunction);
@@ -244,8 +229,8 @@ function getComponent(row: ListItem) {
 
 const cls = computed(() => ({
   body: [
-    gridStore.getUIProps('border') && 'vue-virt-grid-main--border',
-    gridStore.getUIProps('highlightHoverRow') && 'vue-virt-grid-main--highlight-hover-row',
+    gridStore.getUIProps('border') ? 'vue-virt-grid-main--border' : '',
+    gridStore.getUIProps('highlightHoverRow') ? 'vue-virt-grid-main--highlight-hover-row' : '',
   ],
   table: ['vue-virt-grid-table', gridStore.gridScrollingStatus.value],
   leftFixedShadow: [
@@ -292,58 +277,4 @@ onMounted(() => {
 onBeforeUnmount(() => {
   gridStore.eventEmitter.offAll();
 });
-
-let mountEl: HTMLElement | null = null;
-// TODO 写一个简单的popper
-function updatePopperPosition(left: number, top: number) {
-  if (mountEl) {
-    console.log(mountEl.style.top);
-
-    const lastTop = Number(mountEl.style.top.match(/-?[0-9]+/)?.[0] ?? 0);
-    const lastLeft = Number(mountEl.style.left.match(/-?[0-9]+/)?.[0] ?? 0);
-
-    mountEl.style.top = `${lastTop - top}px`;
-    mountEl.style.left = `${lastLeft - left}px`;
-  }
-}
-
-// TODO 拆出去做hook处理
-// function onMouseDown(evt: MouseEvent) {
-//   const path = evt.composedPath() as HTMLElement[];
-//   // console.log(evt, path);
-//   // const targetTr = path.find((el) => el.tagName === 'TR');
-//   const targetTd = path.find((el) => el.tagName === 'TD');
-//   // console.log(targetTd);
-//   // console.log(targetTd, targetTd?.dataset.rowidx, targetTd?.dataset.colidx);
-
-//   if (targetTd) {
-//     if (targetTd?.dataset.rowidx !== undefined) {
-//       gridStore.setSelectRow(Number(targetTd?.dataset.rowidx));
-//     }
-//     if (targetTd?.dataset.colidx !== undefined) {
-//       gridStore.setSelectCol(Number(targetTd?.dataset.colidx));
-//     }
-
-//     // console.log(targetTd, 'left', left, top, width, height);
-//     // 生成popper，加载单元格激活态
-
-//     console.log('column', gridStore.flattedColumns[Number(targetTd?.dataset.colidx)]);
-//     const { customCellCoverRender } = gridStore.flattedColumns[Number(targetTd?.dataset.colidx)];
-
-//     if (customCellCoverRender) {
-//       // const mountEl = document.createElement('div');
-
-//       const { left, top, width, height } = targetTd.getBoundingClientRect();
-//       mountEl = document.querySelector('.vue-virt-grid-popper') as HTMLElement | null;
-//       if (mountEl) {
-//         mountEl.style.position = 'absolute';
-//         mountEl.style.left = `${left}px`;
-//         mountEl.style.top = `${top}px`;
-//         mountEl.style.width = `${width - 1}px`;
-//         mountEl.style.height = `${height - 1}px`;
-//         createPopper(targetTd, customCellCoverRender, mountEl);
-//       }
-//     }
-//   }
-// }
 </script>

@@ -5,7 +5,7 @@
       :checked="watchData.checkboxRows.has(row)"
       @change="(e) => changeValue(e)"
     />
-    <span class="vue-virt-grid-cell__checkbox-filed" v-if="column.field">{{
+    <span class="vue-virt-grid-cell__checkbox-field" v-if="column.field">{{
       column.field ? row[column.field] : ''
     }}</span>
   </div>

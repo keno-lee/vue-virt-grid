@@ -2,6 +2,7 @@ import { type PluginOption } from 'vite';
 import { defineConfig } from 'vitepress';
 import { fileURLToPath } from 'node:url';
 import vueJsx from '@vitejs/plugin-vue-jsx';
+import ElementPlus from 'unplugin-element-plus/vite';
 
 function themeCustomCss(): PluginOption {
   return {
@@ -48,83 +49,59 @@ export default defineConfig({
         { text: '主题', link: '/guide/theme/' },
       ],
       '/examples/': [
-        // TODO 目标菜单
-        // {
-        //   text: '基础功能',
-        //   collapsed: false,
-        //   items: [
-        //     { text: '基础', link: '/examples/base/' },
-        //     { text: 'hover高亮', link: '/examples/highlight/' },
-        //     // { text: '悬浮列高亮', link: '/examples/highlight/' },
-        //     { text: '选中行高亮', link: '/examples/highlight/' },
-        //     { text: '选中列高亮', link: '/examples/highlight/' },
-        //     { text: '单元格选中高亮', link: '/examples/highlight/' },
-        //     // 高阶功能
-        //     { text: '区域选中', link: '/examples/highlight/' },
-        //   ],
-        // },
-        // {
-        //   text: '合并',
-        // },
-        // {
-        //   text: '展开',
-        // },
-        // {
-        //   text: '树形',
-        // },
-        // {
-        //   text: '表尾巴',
-        // },
-        // {
-        //   text: '单元格',
-        // },
-        // {
-        //   text: '事件',
-        // },
-        // {
-        //   text: '事件',
-        // },
-
-        //
-        { text: '基础功能', link: '/examples/base/' },
         {
-          text: '行设置',
-          collapsed: false,
+          text: '配置式表格',
           items: [
-            { text: '高亮 highlight', link: '/examples/highlight/' },
+            {
+              text: '基础功能',
+              collapsed: false,
+              items: [
+                { text: '基础', link: '/examples/base/' },
+                { text: 'hover高亮', link: '/examples/highlight/' },
+                // { text: '悬浮列高亮', link: '/examples/highlight/' },
+                { text: '高亮选中行', link: '/examples/highlight/' },
+                { text: '高亮选中列', link: '/examples/highlight/' },
+                { text: '高亮选中单元格', link: '/examples/highlight/' },
+                // 高阶功能
+                { text: '高亮选中区域', link: '/examples/selection/' },
 
-            { text: '展开 expand', link: '/examples/expand/' },
-            { text: '分组 group', link: '/examples/group/' },
-            { text: '树形 tree', link: '/examples/tree/' },
-          ],
-        },
+                { text: '列固定', link: '/examples/fixed/' },
+                { text: '列宽拖拽', link: '/examples/column/' },
 
-        {
-          text: '列设置',
-          collapsed: false,
-          items: [
-            { text: '列固定', link: '/examples/fixed/' },
-            { text: '复选框', link: '/examples/checkbox/' },
-            { text: '列宽拖拽', link: '/examples/column/' },
-            { text: '自定义索引', link: '/examples/index-view/' },
-            { text: '自定义列渲染', link: '/examples/custom/' },
-          ],
-        },
-        {
-          text: 'Advance',
-          collapsed: false,
-          items: [
+                { text: '自定义类/样式', link: '/examples/custom-class-style/' },
+              ],
+            },
+            { text: '展开', link: '/examples/expand/' },
+            { text: '树形', link: '/examples/tree/' },
+            { text: '分组', link: '/examples/group/' },
             { text: '合并单元格', link: '/examples/merge/' },
-            { text: '高性能', link: '/examples/performance/' },
-            { text: '自定义类/样式', link: '/examples/custom-class-style/' },
+            // { text: '表尾' },
+            {
+              text: '列渲染',
+              collapsed: false,
+              items: [
+                { text: '表头' },
+                { text: '文本' },
+                { text: '索引', link: '/examples/index-view/' },
+                { text: '复选框', link: '/examples/checkbox/' },
+                { text: '单选' },
+                { text: '多选' },
+                { text: '超链接' },
+                { text: '图片' },
+                { text: '人员' },
+                { text: '自定义渲染', link: '/examples/custom/' },
+              ],
+            },
+            {
+              text: '单元格渲染',
+              collapsed: false,
+              items: [{ text: '单元格', link: '/examples/cells/' }],
+            },
             { text: '事件处理', link: '/examples/events/' },
-            { text: 'template', link: '/examples/table/' },
-            { text: '区域选中', link: '/examples/selection/' },
             { text: 'spreadsheet(实验室)', link: '/examples/spreadsheet/' },
-            { text: 'Cells', link: '/examples/cells/' },
+            { text: '高性能', link: '/examples/performance/' },
           ],
         },
-        // { text: 'tfoot(实验室)', link: '/examples/tfoot/' },
       ],
     },
   },
@@ -194,7 +171,7 @@ export default defineConfig({
       jsxFragment: 'Fragment',
     },
     // configFile: path.resolve(__dirname, '../../scripts/dev.ts'),
-    plugins: [vueJsx(), themeCustomCss()],
+    plugins: [ElementPlus({}), vueJsx(), themeCustomCss()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('../../', import.meta.url)),

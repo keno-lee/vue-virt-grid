@@ -10,7 +10,7 @@ const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
   Array.from({ length }).map((_, columnIndex) => ({
     ...props,
     field: `${prefix}${columnIndex}`,
-    title: `Column ${columnIndex}`,
+    title: `Title ${columnIndex}`,
     width: 200,
     resizable: true,
     minWidth: 100,
@@ -21,7 +21,7 @@ const generateList = (columns: ReturnType<typeof generateColumns>, length = 200,
   Array.from({ length }).map((_, rowIndex) => {
     return columns.reduce(
       (rowData, column, columnIndex) => {
-        rowData[column.field] = `Row ${rowIndex} - Col ${columnIndex}`;
+        rowData[column.field] = `Row ${rowIndex} - Field ${columnIndex}`;
         return rowData;
       },
       {

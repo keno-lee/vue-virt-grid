@@ -59,7 +59,7 @@ const generateList = (columns: ReturnType<typeof generateColumns>, length = 200,
   Array.from({ length }).map((_, rowIndex) => {
     return columns.reduce(
       (rowData, column, columnIndex) => {
-        // rowData[column.field] = `Row ${rowIndex} - Col ${columnIndex}`;
+        // rowData[column.field] = `Row ${rowIndex} - Field ${columnIndex}`;
         return rowData;
       },
       {

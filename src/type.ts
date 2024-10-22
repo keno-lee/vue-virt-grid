@@ -1,21 +1,19 @@
 import type { VNode } from 'vue';
 import type { JSX } from 'vue/jsx-runtime';
 
-export enum ColumnSpecType {
-  Expand = 'expand',
-  Title = 'title',
-}
 // 单元格类型
 export enum CellType {
   Index = 'index',
+  Expand = 'expand',
+  Tree = 'tree',
   Radio = 'radio',
   Checkbox = 'checkbox',
   Text = 'text',
-  Link = 'Link',
-  Select = 'Select',
-  MultiSelect = 'MultiSelect',
-  Image = 'Image',
-  Person = 'Person',
+  Link = 'link',
+  Select = 'select',
+  MultiSelect = 'multiSelect',
+  Image = 'image',
+  Person = 'person',
 }
 /**
  * 用户配置时的列配置
@@ -26,7 +24,7 @@ export type Column = {
   // 列标题
   title?: string;
   // 列类型
-  type?: CellType | ColumnSpecType | string;
+  type?: CellType | string;
   // 列宽度
   width?: number;
   // 最小列宽度
@@ -46,15 +44,6 @@ export type Column = {
   // 列的class
   className?: string;
 
-  headerRender?: (column: Column) => VNode | JSX.Element;
-  // 自定义单元格渲染
-  customCellRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
-  // 自定义单元格覆盖渲染 多提供一个rect信息
-  customCellCoverRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
-  // 自定义单元格下拉渲染
-  customCellDropdownRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
-
-  bodyActiveRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
   index?: (index: number) => number;
 
   // TODO 铸韬，可以改到headerCellInfo中
@@ -78,6 +67,17 @@ export type Column = {
         ) => number)
       | boolean;
   };
+
+  // 自定义单元格渲染
+  cellRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
+  // 自定义单元格覆盖渲染 多提供一个rect信息
+  cellCoverRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
+  // 自定义单元格下拉渲染
+  cellDropdownRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
+  // [仅存在于column中] 自定义header渲染
+  headerRender?: (column: Column) => VNode | JSX.Element;
+  // [仅存在于column中] 自定义expand渲染
+  expandRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
 };
 
 /**
@@ -273,24 +273,26 @@ export interface TableOptions {
   rowMinHeight?: number;
 
   showHeader?: boolean;
-  // 树形 or 分组
+  // TODO 最好分开 树形 or 分组
   defaultExpandAll?: boolean;
   // 是否显示border
   border?: boolean;
   // 是否显示斑马纹
   stripe?: boolean;
-  // 是否显示树形线
+  // TODO 样式要重写 是否显示树形线
   showTreeLine?: boolean;
-  // 是否支持框选
+
+  // 是否高亮当前悬浮行
+  highlightHoverRow?: boolean;
+  // TODO 好像没必要用
+  highlightHoverCol?: boolean;
+  // 是否高亮当前选中行
+  highlightSelectRow?: boolean;
+  // 是否高亮当前选中列
+  highlightSelectCol?: boolean;
+  // TODO 要改一个命名 是否支持框选
   selection?: boolean;
 
-  highlightHoverRow?: boolean;
-  highlightHoverCol?: boolean;
-
-  // 是否高亮当前行
-  highlightSelectRow?: boolean;
-  // 是否高亮当前列
-  highlightSelectCol?: boolean;
   // 合并单元格信息
   merges?: MergeCell[];
   // 分组信息
@@ -332,14 +334,16 @@ export interface TableOptions {
     columnIndex: number;
   }) => string;
   // 自定义单元格渲染
-  customCellRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
-  customCellCoverRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
-  customCellDropdownRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
+  cellRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
+  cellCoverRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
+  cellDropdownRender?: (column: Column, row: ListItem, extra: any) => VNode | JSX.Element;
+  // TODO 还没实现 分组单元格渲染
+  groupRender?: (column: Column, row: ListItem) => VNode | JSX.Element;
 }
 
 export type CustomRender = Pick<
   TableOptions,
-  'customCellRender' | 'customCellCoverRender' | 'customCellDropdownRender'
+  'cellRender' | 'cellCoverRender' | 'cellDropdownRender'
 >;
 
 export interface GridProps {

@@ -24,7 +24,7 @@
   </div>
 </template>
 <script setup lang="tsx">
-import { Grid, type Column, type ListItem, CellType, ColumnSpecType } from 'vue-virt-grid';
+import { Grid, type Column, type ListItem, CellType } from 'vue-virt-grid';
 
 const extraText = `Velit sed aspernatur tempora. Natus consequatur officiis dicta vel assumenda.`;
 
@@ -32,16 +32,16 @@ const columns: Column[] = [
   {
     title: '',
     field: '',
-    type: ColumnSpecType.Expand,
+    type: CellType.Expand,
     width: 50,
-    customCellRender: (column, row) => {
+    cellRender: (column, row) => {
       return (<div style="max-height: 200px; overflow: auto">{extraText}</div>) as any;
     },
   },
 ];
 for (let i = 0; i < 100; i++) {
   columns.push({
-    field: `key${i}`,
+    field: `field${i}`,
     title: `title${i}`,
     type: CellType.Text,
     width: 100,
@@ -52,19 +52,19 @@ const list: ListItem[] = [];
 for (let i = 0; i < 100; i++) {
   const item: ListItem = {
     id: i.toString(),
-    key0: `row${i}-key`,
-    key1: `row${i}-key1`,
-    key2: `row${i}-key2`,
-    key3: `row${i}-key3`,
-    key4: `row${i}-key4`,
-    key5: `row${i}-key5`,
-    key6: `row${i}-key6`,
-    key7: `row${i}-key7`,
-    key8: `row${i}-key8`,
-    key9: `row${i}-key9`,
-    key10: `row${i}-key10`,
-    key11: `row${i}-key11`,
-    key12: `row${i}-key12`,
+    field0: `row${i}-field`,
+    field1: `row${i}-field1`,
+    field2: `row${i}-field2`,
+    field3: `row${i}-field3`,
+    field4: `row${i}-field4`,
+    field5: `row${i}-field5`,
+    field6: `row${i}-field6`,
+    field7: `row${i}-field7`,
+    field8: `row${i}-field8`,
+    field9: `row${i}-field9`,
+    field10: `row${i}-field10`,
+    field11: `row${i}-field11`,
+    field12: `row${i}-field12`,
     children: [] as any[],
   };
   list.push(item);

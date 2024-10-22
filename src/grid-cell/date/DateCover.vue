@@ -1,7 +1,9 @@
 <template>
-  <div class="vue-virt-grid-popper-cell vue-virt-grid-cell__select-cover">
-    <div class="vue-virt-grid-cell__select-cover-content">222</div>
-    <div class="vue-virt-grid-cell__select-cover-icon">
+  <div class="vue-virt-grid-popper-cell vue-virt-grid-cell__date-cover">
+    <div class="vue-virt-grid-cell__date-cover-content">
+      <input type="text" value="2024/09/25" />
+    </div>
+    <!-- <div class="vue-virt-grid-cell__select-cover-icon">
       <svg
         width="100%"
         height="100%"
@@ -14,7 +16,7 @@
           fill="var(--virt-tree-color-icon)"
         ></path>
       </svg>
-    </div>
+    </div> -->
   </div>
 </template>
 <script setup lang="tsx">
@@ -38,7 +40,7 @@ const props = defineProps({
 </script>
 
 <style lang="scss">
-.vue-virt-grid-cell__select-cover {
+.vue-virt-grid-cell__date-cover {
   width: 100%;
   height: 100%;
   background-color: cyan;
@@ -47,17 +49,13 @@ const props = defineProps({
   user-select: none;
   display: flex;
 
-  .vue-virt-grid-cell__select-content {
-    flex: 1;
-  }
+  .vue-virt-grid-cell__date-cover-content {
+    width: 100%;
+    height: 100%;
 
-  .vue-virt-grid-cell__select-icon {
-    width: 16px;
-    height: 16px;
-    svg {
+    input {
       width: 100%;
       height: 100%;
-      fill: red;
     }
   }
 }
