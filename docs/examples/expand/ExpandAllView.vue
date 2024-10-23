@@ -13,7 +13,6 @@
 </template>
 <script setup lang="tsx">
 import { Grid, type Column, type ListItem, CellType } from 'vue-virt-grid';
-import type { VNode } from 'vue';
 
 const columns: Column[] = [
   {
@@ -21,7 +20,7 @@ const columns: Column[] = [
     field: '',
     type: CellType.Expand,
     width: 50,
-    cellRender: (column, row) => {
+    expandRender: (column, row) => {
       return (
         <div>
           <p>展开行包含子表格</p>
@@ -59,7 +58,9 @@ const columns: Column[] = [
                 attribute: 'ccc',
               },
             ]}
-            border
+            options={{
+              border: true,
+            }}
           ></Grid>
         </div>
       ) as any;
