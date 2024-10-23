@@ -3,7 +3,7 @@ export const getCellFromEvent = (e: MouseEvent) => {
     .composedPath()
     .find(
       (v) =>
-        !(v as HTMLElement).classList?.contains('vue-virt-grid-cell--unselectable') &&
+        !(v as HTMLElement).classList?.contains('vtg-cell--unselectable') &&
         (v as HTMLElement).dataset?.colidx &&
         (v as HTMLElement).dataset?.rowidx,
     ) as HTMLElement;

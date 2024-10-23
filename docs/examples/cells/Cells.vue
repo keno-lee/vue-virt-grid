@@ -28,7 +28,7 @@ import {
   type TdData,
 } from 'vue-virt-grid';
 import { ElSelect, ElOption } from 'element-plus';
-// const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
+// const generateColumns = (length = 10, prefix = 'field-', props?: any) =>
 //   Array.from({ length }).map((_, columnIndex) => ({
 //     ...props,
 //     field: `${prefix}${columnIndex}`,

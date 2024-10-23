@@ -1,7 +1,7 @@
 <template>
-  <div class="vue-virt-grid-cell vue-virt-grid-cell__checkbox">
+  <div class="vtg-cell vtg-cell__checkbox">
     <input type="radio" :checked="watchData.radioRow?.id === row.id" @change="changeValue" />
-    <span class="vue-virt-grid-cell__checkbox-field" v-if="column.field">{{
+    <span class="vtg-cell__checkbox-field" v-if="column.field">{{
       column.field ? row[column.field] : ''
     }}</span>
   </div>

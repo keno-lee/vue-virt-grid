@@ -269,8 +269,10 @@ export interface SelectedCells {
 }
 
 export interface TableOptions {
-  rowKey?: string | number;
+  fixedRowHeight?: boolean;
   rowMinHeight?: number;
+
+  rowKey?: string | number;
 
   showHeader?: boolean;
   // TODO 最好分开 树形 or 分组

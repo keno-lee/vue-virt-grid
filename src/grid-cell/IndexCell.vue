@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-virt-grid-cell vue-virt-grid-cell__index">
+  <div class="vtg-cell vtg-cell__index">
     {{ indexValue }}
   </div>
 </template>

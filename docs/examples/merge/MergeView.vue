@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { Grid, type Column, type ListItem } from 'vue-virt-grid';
 
-const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
+const generateColumns = (length = 10, prefix = 'field-', props?: any) =>
   Array.from({ length }).map((_, columnIndex) => ({
     ...props,
     field: `${prefix}${columnIndex}`,
@@ -40,7 +40,7 @@ const generateList = (columns: ReturnType<typeof generateColumns>, length = 200,
 const columns: Column[] = generateColumns(1000);
 const list: ListItem[] = generateList(columns, 5000);
 
-// list[1]['column-11'] =
+// list[1]['field-11'] =
 //   'vue-virt-grid是一个基于vue-virt-list的vue3的表格组件，支持合并单元格，虚拟滚动，固定列，固定行，树形表格';
 // const merges = [
 //   {

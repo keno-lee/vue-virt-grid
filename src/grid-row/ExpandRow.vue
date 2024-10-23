@@ -1,7 +1,7 @@
 <template>
-  <tr ref="itemRefEl" class="vue-virt-grid-tr">
-    <td class="vue-virt-grid-td vue-virt-grid-td--expand" :colspan="flattedColumns.length">
-      <div class="vue-virt-grid-cell">
+  <tr ref="itemRefEl" class="vtg-tr">
+    <td class="vtg-td vtg-td--expand" :colspan="flattedColumns.length">
+      <div class="vtg-cell">
         <component :is="getRenderRow(row)"></component>
       </div>
     </td>

@@ -27,7 +27,7 @@
 <script lang="ts" setup>
 import { GridTable, GridTableColumn, type Column, type ListItem, CellType } from 'vue-virt-grid';
 
-const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
+const generateColumns = (length = 10, prefix = 'field-', props?: any) =>
   Array.from({ length }).map((_, columnIndex) => ({
     ...props,
     field: `${prefix}${columnIndex}`,

@@ -1,6 +1,6 @@
 <template>
-  <div class="vue-virt-grid-cell vue-virt-grid-cell__select">
-    <div class="vue-virt-grid-cell__select-content">SelectView - {{ value }}</div>
+  <div class="vtg-cell vtg-cell__select">
+    <div class="vtg-cell__select-content">SelectView - {{ value }}</div>
   </div>
 </template>
 <script setup lang="tsx">
@@ -26,11 +26,11 @@ const value = computed(() => {
 </script>
 
 <style lang="scss">
-.vue-virt-grid-cell__select {
+.vtg-cell__select {
   display: flex;
   align-items: center;
 
-  .vue-virt-grid-cell__select-content {
+  .vtg-cell__select-content {
     flex: 1;
   }
 }

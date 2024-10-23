@@ -73,23 +73,23 @@ const centerNormalHeaderColumns = computed(() => columnsInfo.centerNormalHeaderC
 
 const cls = {
   leftFixed: (column: ColumnItem) => [
-    'vue-virt-grid-th',
+    'vtg-th',
     'is-fixed',
     'is-fixed--left',
     getCellClass(column),
     column.className,
   ],
-  leftPadding: () => ['vue-virt-grid-th'],
-  main: (column: ColumnItem) => ['vue-virt-grid-th', getCellClass(column), column.className],
-  rightPadding: () => ['vue-virt-grid-th'],
+  leftPadding: () => ['vtg-th'],
+  main: (column: ColumnItem) => ['vtg-th', getCellClass(column), column.className],
+  rightPadding: () => ['vtg-th'],
   rightFixed: (column: ColumnItem) => [
-    'vue-virt-grid-th',
+    'vtg-th',
     'is-fixed',
     'is-fixed--right',
     getCellClass(column),
     column.className,
   ],
-  row: () => ['vue-virt-grid-tr', getRowClass()],
+  row: () => ['vtg-tr', getRowClass()],
 };
 
 const props = withDefaults(

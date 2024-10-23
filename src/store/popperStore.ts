@@ -17,9 +17,9 @@ class PopperStore {
     if (!isFunction(tdData.column?.cellCoverRender)) return;
 
     this.coverEl = document.createElement('div');
-    this.coverEl.classList.add('vue-virt-grid-popper-container');
+    this.coverEl.classList.add('vtg-popper-container');
 
-    this.mountEl = document.querySelector('.vue-virt-grid-main') as HTMLElement | null;
+    this.mountEl = document.querySelector('.vtg-main') as HTMLElement | null;
 
     const app = createApp({
       render: () => tdData.column.cellCoverRender?.(tdData.column, tdData.row, tdData),
@@ -47,9 +47,9 @@ class PopperStore {
     if (!isFunction(tdData.column?.dropdownRender)) return;
 
     this.dropdownEl = document.createElement('div');
-    this.dropdownEl.classList.add('vue-virt-grid-popper-container');
+    this.dropdownEl.classList.add('vtg-popper-container');
 
-    this.mountEl = document.querySelector('.vue-virt-grid-main') as HTMLElement | null;
+    this.mountEl = document.querySelector('.vtg-main') as HTMLElement | null;
 
     const app = createApp({
       render: () => tdData.column.cellDropdownRender?.(tdData.column, tdData.row, tdData),

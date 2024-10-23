@@ -20,7 +20,7 @@ export class GridScrollZone {
     this.scrollUpZone.style.top = '0';
     this.scrollUpZone.style.background = 'transparent'; // 'rgba(255,165,0,0.8)';
     this.scrollUpZone.style.zIndex = '-100';
-    this.scrollUpZone.id = 'vue-virt-grid-scroll-zone__top';
+    this.scrollUpZone.id = 'vtg-scroll-zone__top';
 
     this.scrollDownZone = document.createElement('div');
     this.scrollDownZone.style.width = '3000px';
@@ -30,7 +30,7 @@ export class GridScrollZone {
     this.scrollDownZone.style.bottom = '0';
     this.scrollDownZone.style.background = 'transparent'; // 'rgba(255,165,0,0.8)';
     this.scrollDownZone.style.zIndex = '-100';
-    this.scrollUpZone.id = 'vue-virt-grid-scroll-zone__bottom';
+    this.scrollUpZone.id = 'vtg-scroll-zone__bottom';
   }
 
   init(container: HTMLElement) {

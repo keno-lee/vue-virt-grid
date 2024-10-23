@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-virt-grid-cell__date-dropdown">时间选择器</div>
+  <div class="vtg-cell__date-dropdown">时间选择器</div>
 </template>
 <script setup lang="tsx">
 import { type PropType } from 'vue';
@@ -22,7 +22,7 @@ const props = defineProps({
 </script>
 
 <style lang="scss">
-.vue-virt-grid-cell__date-dropdown {
+.vtg-cell__date-dropdown {
   width: 220px;
   height: 300px;
   border-radius: 4px;

@@ -1,6 +1,6 @@
 <template>
-  <div class="vue-virt-grid-popper-cell vue-virt-grid-cell__select-cover">
-    <div class="vue-virt-grid-cell__select-cover-content">
+  <div class="vtg-popper-cell vtg-cell__select-cover">
+    <div class="vtg-cell__select-cover-content">
       <div class="tag-item">
         <span>哈哈哈</span>
         <span>x</span>
@@ -14,7 +14,7 @@
         <span>x</span>
       </div>
     </div>
-    <!-- <div class="vue-virt-grid-cell__select-cover-icon">
+    <!-- <div class="vtg-cell__select-cover-icon">
       <svg
         width="100%"
         height="100%"
@@ -51,7 +51,7 @@ const props = defineProps({
 </script>
 
 <style lang="scss">
-.vue-virt-grid-cell__select-cover {
+.vtg-cell__select-cover {
   width: 100%;
   height: 100%;
   background-color: cyan;
@@ -60,7 +60,7 @@ const props = defineProps({
   user-select: none;
   display: flex;
 
-  .vue-virt-grid-cell__select-cover-content {
+  .vtg-cell__select-cover-content {
     height: 100%;
     flex: 1;
     display: flex;
@@ -77,7 +77,7 @@ const props = defineProps({
     }
   }
 
-  .vue-virt-grid-cell__select-icon {
+  .vtg-cell__select-icon {
     width: 16px;
     height: 16px;
     svg {

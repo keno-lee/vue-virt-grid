@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-virt-grid-cell vue-virt-grid-cell__text">
+  <div class="vtg-cell vtg-cell__text">
     {{ column.field ? row[column.field] : '' }}
   </div>
 </template>

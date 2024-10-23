@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-virt-grid-th-cell">
+  <div class="vtg-th-cell">
     {{ column.title }}
   </div>
 </template>

@@ -1,14 +1,12 @@
 <template>
-  <div class="vue-virt-grid-th-cell vue-virt-grid-th-cell__checkbox">
+  <div class="vtg-th-cell vtg-th-cell__checkbox">
     <input
       type="checkbox"
       :indeterminate="isIndeterminate"
       :checked="fullChecked"
       @change="(e) => changeValue(e)"
     />
-    <span class="vue-virt-grid-th-cell__checkbox-title" v-if="column.title">{{
-      column.title
-    }}</span>
+    <span class="vtg-th-cell__checkbox-title" v-if="column.title">{{ column.title }}</span>
   </div>
 </template>
 <script setup lang="ts">

@@ -4,17 +4,17 @@ import { fileURLToPath } from 'node:url';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import ElementPlus from 'unplugin-element-plus/vite';
 
-function themeCustomCss(): PluginOption {
-  return {
-    name: 'theme-custom-css',
-    enforce: 'pre',
-    resolveId(source, importer, options) {
-      if (source.endsWith('vp-doc.css')) {
-        return fileURLToPath(new URL('./theme/vp-doc-custom.css', import.meta.url));
-      }
-    },
-  };
-}
+// function themeCustomCss(): PluginOption {
+//   return {
+//     name: 'theme-custom-css',
+//     enforce: 'pre',
+//     resolveId(source, importer, options) {
+//       if (source.endsWith('vp-doc.css')) {
+//         return fileURLToPath(new URL('./theme/vp-doc-custom.css', import.meta.url));
+//       }
+//     },
+//   };
+// }
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -30,8 +30,8 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Guide', link: '/guide/start/' },
-      { text: 'Examples', link: '/examples/base/' },
+      { text: '指南', link: '/guide/start/' },
+      { text: '示例', link: '/examples/base/basic/' },
       { text: 'API', link: '/api/' },
       // { text: 'Playground', link: '/playground/' },
     ],
@@ -56,7 +56,9 @@ export default defineConfig({
               text: '基础功能',
               collapsed: false,
               items: [
-                { text: '基础', link: '/examples/base/' },
+                { text: '基础', link: '/examples/base/basic/' },
+                { text: '固定行高', link: '/examples/base/fixed/' },
+                { text: '动态行高', link: '/examples/base/dynamic/' },
                 { text: 'hover高亮', link: '/examples/highlight/' },
                 // { text: '悬浮列高亮', link: '/examples/highlight/' },
                 { text: '高亮选中行', link: '/examples/highlight/' },
@@ -171,7 +173,7 @@ export default defineConfig({
       jsxFragment: 'Fragment',
     },
     // configFile: path.resolve(__dirname, '../../scripts/dev.ts'),
-    plugins: [ElementPlus({}), vueJsx(), themeCustomCss()],
+    plugins: [ElementPlus({}), vueJsx()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('../../', import.meta.url)),

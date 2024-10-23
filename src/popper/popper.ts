@@ -197,8 +197,7 @@ export const createPopper = ({
     document.addEventListener('click', (evt: MouseEvent) => {
       const popper = (evt.composedPath() as HTMLElement[]).find(
         (el: HTMLElement) =>
-          el?.classList?.contains('vue-virt-grid-popper-container') ||
-          el?.classList?.contains('vue-virt-grid-td'),
+          el?.classList?.contains('vtg-popper-container') || el?.classList?.contains('vtg-td'),
       );
       if (!popper) {
         mountEl.removeChild(popperContainer);

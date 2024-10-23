@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-virt-grid-cell__select-dropdown">
+  <div class="vtg-cell__select-dropdown">
     <!-- <div class="search">
       <input type="text" placeholder="select" />
     </div> -->
@@ -34,7 +34,7 @@ const props = defineProps({
 </script>
 
 <style lang="scss">
-.vue-virt-grid-cell__select-dropdown {
+.vtg-cell__select-dropdown {
   width: 220px;
   max-height: 300px;
   border-radius: 4px;

@@ -123,7 +123,7 @@ export default defineComponent({
 
     const cls = {
       leftFixed: (column: ColumnItem) => [
-        'vue-virt-grid-td',
+        'vtg-td',
         'is-fixed',
         'is-fixed--left',
         column._id === selectColId.value && 'current-column',
@@ -131,17 +131,17 @@ export default defineComponent({
         getCellClass(column),
         column.className,
       ],
-      leftPadding: () => ['vue-virt-grid-td'],
+      leftPadding: () => ['vtg-td'],
       main: (column: ColumnItem) => [
-        'vue-virt-grid-td',
+        'vtg-td',
         column._id === selectColId.value && 'current-column',
         gridStore.getSelectionClass(props.rowIndex, column),
         getCellClass(column),
         column.className,
       ],
-      rightPadding: () => ['vue-virt-grid-td'],
+      rightPadding: () => ['vtg-td'],
       rightFixed: (column: ColumnItem) => [
-        'vue-virt-grid-td',
+        'vtg-td',
         'is-fixed',
         'is-fixed--right',
         column._id === selectColId.value && 'current-column',
@@ -150,8 +150,8 @@ export default defineComponent({
         column.className,
       ],
       row: () => [
-        'vue-virt-grid-tr',
-        gridStore.getUIProps('stripe') && props.rowIndex % 2 && 'vue-virt-grid-tr--striped',
+        'vtg-tr',
+        gridStore.getUIProps('stripe') && props.rowIndex % 2 && 'vtg-tr--striped',
         props.row.id === selectRowId.value && 'current-row',
         getRowClass(),
       ],
@@ -213,7 +213,7 @@ export default defineComponent({
           key={`${watchData.renderKey}-${rowIndex}-lp`}
           data-colidx="lp"
           data-rowidx={rowIndex}
-          class={'vue-virt-grid-td'}
+          class={'vtg-td'}
           style={`height: ${maxHeight}px`}
           rowspan={1}
           colspan={watchData.renderRect.xs}
@@ -285,7 +285,7 @@ export default defineComponent({
           key={`${watchData.renderKey}-${rowIndex}-rp`}
           data-colidx="rp"
           data-rowidx={rowIndex}
-          class={'vue-virt-grid-td'}
+          class={'vtg-td'}
           style={`height: ${maxHeight}px`}
           rowspan={1}
           // todo why 要减去右侧length呢

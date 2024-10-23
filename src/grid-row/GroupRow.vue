@@ -1,7 +1,7 @@
 <template>
-  <tr ref="itemRefEl" class="vue-virt-grid-tr vue-virt-grid-tr--group">
-    <td class="vue-virt-grid-td vue-virt-grid-td--group" :colspan="flattedColumns.length">
-      <div class="vue-virt-grid-cell" :style="`height: ${config.rowHeight}px;`">
+  <tr ref="itemRefEl" class="vtg-tr vtg-tr--group">
+    <td class="vtg-td vtg-td--group" :colspan="flattedColumns.length">
+      <div class="vtg-cell" :style="`height: ${config.rowHeight}px;`">
         <Placement
           v-for="item in props.row.level"
           :key="item"

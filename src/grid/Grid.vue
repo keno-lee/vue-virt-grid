@@ -1,6 +1,6 @@
 <template>
-  <div class="vue-virt-grid-root" ref="rootRefEl">
-    <div class="vue-virt-grid-main" ref="clientRefEl" data-id="client" :class="cls.body">
+  <div class="vtg-root" ref="rootRefEl">
+    <div class="vtg-main" ref="clientRefEl" data-id="client" :class="cls.body">
       <!-- height skeleton -->
       <div :style="`float:left; height: ${vlReactiveData.listTotalSize}px`"></div>
       <!-- table main -->
@@ -23,13 +23,13 @@
         <thead
           ref="stickyHeaderRefEl"
           data-id="stickyHeader"
-          class="vue-virt-grid-header"
+          class="vtg-header"
           :style="`height: ${headerHeight}px;`"
           v-if="gridStore.getUIProps('showHeader')"
         >
           <GridHeader></GridHeader>
         </thead>
-        <tbody class="vue-virt-grid-body">
+        <tbody class="vtg-body">
           <!-- TODO 未来这里会给顶部滚动行的渲染 -->
           <!-- <tr style="position: sticky; top: 40px; z-index: 20; background-color: red;">
             <td>111</td>
@@ -60,7 +60,7 @@
         <!-- <tfoot
           ref="stickyFooterRefEl"
           data-id="stickyFooter"
-          class="vue-virt-grid-footer"
+          class="vtg-footer"
           style="
             position: sticky;
             bottom: 0;
@@ -84,7 +84,7 @@
       :class="cls.rightFixedShadow"
       :style="{ right: `${gridStore.watchData.fixedInfo.rightWidth + 16 || 0}px` }"
     ></div>
-    <div class="vue-virt-grid-mask" v-if="isEmpty">
+    <div class="vtg-mask" v-if="isEmpty">
       <slot name="empty"><p>No Data</p></slot>
     </div>
   </div>
@@ -229,20 +229,20 @@ function getComponent(row: ListItem) {
 
 const cls = computed(() => ({
   body: [
-    gridStore.getUIProps('border') ? 'vue-virt-grid-main--border' : '',
-    gridStore.getUIProps('highlightHoverRow') ? 'vue-virt-grid-main--highlight-hover-row' : '',
+    gridStore.getUIProps('border') ? 'vtg-main--border' : '',
+    gridStore.getUIProps('highlightHoverRow') ? 'vtg-main--highlight-hover-row' : '',
   ],
-  table: ['vue-virt-grid-table', gridStore.gridScrollingStatus.value],
+  table: ['vtg-table', gridStore.gridScrollingStatus.value],
   leftFixedShadow: [
-    'vue-virt-grid-fixed-shadow',
+    'vtg-fixed-shadow',
     gridStore.gridScrollingStatus.value !== 'is-scrolling-left' && leftFixedColumns.length > 0
-      ? 'vue-virt-grid-fixed-shadow--left'
+      ? 'vtg-fixed-shadow--left'
       : '',
   ],
   rightFixedShadow: [
-    'vue-virt-grid-fixed-shadow',
+    'vtg-fixed-shadow',
     gridStore.gridScrollingStatus.value !== 'is-scrolling-right' && rightFixedColumns.length > 0
-      ? 'vue-virt-grid-fixed-shadow--right'
+      ? 'vtg-fixed-shadow--right'
       : '',
   ],
 }));

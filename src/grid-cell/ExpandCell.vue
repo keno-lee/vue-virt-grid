@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="vue-virt-grid-cell vue-virt-grid-cell__expand"
-    @click="gridStore.toggleExpand(row.id)"
-  >
+  <div class="vtg-cell vtg-cell__expand" @click="gridStore.toggleExpand(row.id)">
     <div :class="['row-expand-icon', watchData.expandMap[row.id] && 'row-expand-icon--expand']">
       <svg
         xmlns="http://www.w3.org/2000/svg"

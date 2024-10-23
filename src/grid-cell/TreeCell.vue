@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-virt-grid-cell vue-virt-grid-cell__title" :style="`width: ${column.width}px;`">
+  <div class="vtg-cell vtg-cell__title" :style="`width: ${column.width}px;`">
     <Placement
       v-for="item in row.level"
       :key="item"
@@ -67,7 +67,7 @@ const customBody = computed(() => {
 });
 </script>
 <style lang="scss">
-.vue-virt-grid-cell__title {
+.vtg-cell__title {
   display: flex;
   align-items: center;
   // background-color: grey;

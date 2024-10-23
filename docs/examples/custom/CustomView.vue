@@ -16,7 +16,7 @@
 import { Grid, type Column, type ListItem } from 'vue-virt-grid';
 import CustomCell from './CustomCell.vue';
 
-const generateColumns = (length = 10, prefix = 'column-', props?: any) =>
+const generateColumns = (length = 10, prefix = 'field-', props?: any) =>
   Array.from({ length }).map((_, columnIndex) => ({
     ...props,
     field: `${prefix}${columnIndex}`,

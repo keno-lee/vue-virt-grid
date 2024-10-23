@@ -1,11 +1,11 @@
 <template>
-  <div class="vue-virt-grid-cell vue-virt-grid-cell__checkbox">
+  <div class="vtg-cell vtg-cell__checkbox">
     <input
       type="checkbox"
       :checked="watchData.checkboxRows.has(row)"
       @change="(e) => changeValue(e)"
     />
-    <span class="vue-virt-grid-cell__checkbox-field" v-if="column.field">{{
+    <span class="vtg-cell__checkbox-field" v-if="column.field">{{
       column.field ? row[column.field] : ''
     }}</span>
   </div>
