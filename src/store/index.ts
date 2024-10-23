@@ -192,7 +192,6 @@ export class GridStore {
     list: [] as ListItem[],
     minSize: 40,
     itemKey: this.rowKey,
-    fixed: true,
     // buffer: 4,
     renderControl: (begin: number, end: number) => {
       this.watchData.originRect.ys = begin;
