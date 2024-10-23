@@ -15,8 +15,9 @@ body {
     padding: 0 32px !important;
   }
 
-  .VPNavBar:not(.top) .content-body {
-    background-color: transparent !important;
+  .VPNavBar.has-sidebar .content {
+    padding-left: var(--vp-sidebar-width) !important;
+    padding-right: 32px !important;
   }
 }
 

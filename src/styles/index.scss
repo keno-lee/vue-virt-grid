@@ -38,6 +38,7 @@
     padding: 0;
     -webkit-tap-highlight-color: transparent;
     box-sizing: border-box;
+    border: unset;
   }
 }
 
@@ -110,7 +111,8 @@
 // 表格
 table.vtg-table {
   display: table;
-  border-collapse: separate;
+  // border-collapse: separate;
+  border-collapse: collapse;
   min-width: 100%;
   table-layout: fixed;
   border-spacing: 0;
@@ -368,13 +370,20 @@ tbody.vtg-body {
     }
   }
 
+  // 文本溢出隐藏
+  td.overflow-ellipsis {
+    div.vtg-cell {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 8px 12px;
+      white-space: nowrap;
+    }
+  }
+
   div.vtg-cell {
     box-sizing: border-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: normal;
     word-break: break-all;
-    // line-height: 23px;
     padding: 8px 12px;
 
     &.vtg-cell__index {

@@ -269,10 +269,9 @@ export interface SelectedCells {
 }
 
 export interface TableOptions {
-  fixedRowHeight?: boolean;
-  rowMinHeight?: number;
-
   rowKey?: string | number;
+  rowMinHeight?: number;
+  showOverflow?: '' | 'ellipsis' | 'tooltip';
 
   showHeader?: boolean;
   // TODO 最好分开 树形 or 分组

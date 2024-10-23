@@ -57,17 +57,15 @@ export default defineConfig({
               collapsed: false,
               items: [
                 { text: '基础', link: '/examples/base/basic/' },
-                { text: '固定行高', link: '/examples/base/fixed/' },
-                { text: '动态行高', link: '/examples/base/dynamic/' },
-                { text: 'hover高亮', link: '/examples/highlight/' },
-                // { text: '悬浮列高亮', link: '/examples/highlight/' },
-                { text: '高亮选中行', link: '/examples/highlight/' },
-                { text: '高亮选中列', link: '/examples/highlight/' },
-                { text: '高亮选中单元格', link: '/examples/highlight/' },
-                // 高阶功能
-                { text: '高亮选中区域', link: '/examples/selection/' },
+                { text: '边框', link: '/examples/base/border/' },
+                { text: '斑马纹', link: '/examples/base/stripe/' },
+                { text: '空态', link: '/examples/base/empty/' },
+                { text: '无表头', link: '/examples/base/no-header/' },
+                { text: '自动换行', link: '/examples/base/wrap/' },
+                { text: '溢出隐藏', link: '/examples/base/overflow/' },
+                { text: '高亮', link: '/examples/base/highlight/' },
+                { text: '冻结列', link: '/examples/base/fixed/' },
 
-                { text: '列固定', link: '/examples/fixed/' },
                 { text: '列宽拖拽', link: '/examples/column/' },
 
                 { text: '自定义类/样式', link: '/examples/custom-class-style/' },

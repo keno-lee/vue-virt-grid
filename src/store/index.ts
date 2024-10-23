@@ -43,6 +43,8 @@ export interface IUIProps {
   showHeader: boolean;
   selection: boolean;
 
+  showOverflow: '' | 'ellipsis' | 'tooltip';
+
   highlightHoverRow: boolean;
   highlightHoverCol: boolean;
 
@@ -111,6 +113,7 @@ const defaultUIProps: IUIProps = {
   showTreeLine: false,
   selection: false,
   showHeader: true,
+  showOverflow: '',
   highlightHoverRow: false,
   highlightHoverCol: false,
   highlightSelectRow: false,
@@ -189,6 +192,7 @@ export class GridStore {
     list: [] as ListItem[],
     minSize: 40,
     itemKey: this.rowKey,
+    fixed: true,
     // buffer: 4,
     renderControl: (begin: number, end: number) => {
       this.watchData.originRect.ys = begin;
@@ -209,6 +213,8 @@ export class GridStore {
     showTreeLine: false,
     selection: false,
     showHeader: true,
+
+    showOverflow: '',
 
     highlightHoverRow: false,
     highlightHoverCol: false,
@@ -657,8 +663,8 @@ export class GridStore {
     this.virtualListProps.itemKey = key;
   }
 
-  setRowMinHeight(minHeight: number) {
-    this.virtualListProps.minSize = minHeight;
+  setRowMinHeight(rowMinHeight: number) {
+    this.virtualListProps.minSize = rowMinHeight;
   }
 
   setColumns(columns: Column[]) {
@@ -1142,7 +1148,7 @@ export class GridStore {
     const type = column.type;
 
     if (type === CellType.Expand || type === CellType.Index || type === CellType.Checkbox) {
-      return 'vue-virt-grid-cell--unselectable';
+      return 'vtg-cell--unselectable';
     }
 
     const id = `${rowIndex}-${colIndex}`;
