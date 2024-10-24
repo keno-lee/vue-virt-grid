@@ -6,19 +6,23 @@
 > 2. 选中行列（select）
 > 3. 区域选中（selection）
 
-## 悬浮 行(hover)
+## 悬浮行(hover)
 
 <!<< ./HighlightHoverView.vue
 
-## 选中 行/列(select)
+## 选中行/列(select)
 
 <!<< ./HighlightSelectView.vue
 
-## 区域选中 + 行列高亮 （要改样式）
+## 选中单元格(select)
+
+<!<< ./HighlightSelectCellView.vue
+
+## 区域选中 + 行列高亮 （可以暂时不开发）
 
 <!<< ./SelectionHighlightView.vue
 
-## 区域选中
+## 区域选中（可以暂时不开发）
 
 1. 选中单元格后拖动快速创建区域
 2. 按住command/ctrl可以选中多个区域

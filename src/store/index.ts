@@ -50,6 +50,8 @@ export interface IUIProps {
 
   highlightSelectRow: boolean;
   highlightSelectCol: boolean;
+  highlightSelectCell: boolean;
+
   defaultExpandAll: boolean;
   headerRowClassName: (data: { row: Column[]; rowIndex: number }) => string;
   headerRowStyle: (data: { row: Column[]; rowIndex: number }) => string;
@@ -108,6 +110,7 @@ export interface IColumnsRenderInfo {
 }
 
 const defaultUIProps: IUIProps = {
+  // TODO 看看要不要默认true好一点
   border: false,
   stripe: false,
   showTreeLine: false,
@@ -118,6 +121,7 @@ const defaultUIProps: IUIProps = {
   highlightHoverCol: false,
   highlightSelectRow: false,
   highlightSelectCol: false,
+  highlightSelectCell: false,
   defaultExpandAll: false,
   headerRowClassName: () => '',
   headerRowStyle: () => '',
@@ -131,7 +135,7 @@ const defaultUIProps: IUIProps = {
 
 const defaultGridOptions = {
   rowKey: 'id',
-  rowMinHeight: 40,
+  rowMinHeight: 32,
   merges: [] as MergeCell[],
   groupConfig: [] as { columnId: string; sort: 'desc' | 'asc' }[],
   ...defaultUIProps,
@@ -190,7 +194,7 @@ export class GridStore {
   // 非响应式
   virtualListProps = shallowReactive({
     list: [] as ListItem[],
-    minSize: 40,
+    minSize: 32,
     itemKey: this.rowKey,
     // buffer: 4,
     renderControl: (begin: number, end: number) => {
@@ -220,6 +224,8 @@ export class GridStore {
 
     highlightSelectRow: false,
     highlightSelectCol: false,
+    highlightSelectCell: false,
+
     defaultExpandAll: false,
     headerRowClassName: () => '',
     headerRowStyle: () => '',
@@ -231,6 +237,7 @@ export class GridStore {
     cellStyle: () => '',
   });
 
+  // TODO 区域框选要重新做
   interaction = shallowReactive<IInteractionProps>({
     selectBoxes: {},
     selectCellBorderMap: {},
@@ -297,6 +304,9 @@ export class GridStore {
     this.popperStore = new PopperStore(this);
     this.initOptions(props.options);
     this.setColumns(props.columns);
+
+    // TODO boxselection要重新做一下
+    // this.gridSelection.on(this.handleSelectionChange);
   }
 
   // TODO 仅合并单元格模式需要计算，提升性能
@@ -1023,6 +1033,128 @@ export class GridStore {
     return this.uiProps[key];
   }
 
+  handleSelectionChange = (
+    id: string,
+    area: { left: number; top: number; right: number; bottom: number },
+    isMultiple: boolean,
+  ) => {
+    const mergedArea = this.expandMergedSelectArea(area);
+
+    let selectBoxes = {
+      [id]: mergedArea,
+    };
+
+    if (isMultiple) {
+      selectBoxes = {
+        ...this.interaction.selectBoxes,
+        ...selectBoxes,
+      };
+    }
+
+    const posMap: Record<string, Set<ISelectionBorderPos>> = {};
+    const cellBorderMap: Record<string, ISelectionBorderPos[]> = {};
+
+    Object.keys(selectBoxes).forEach((boxId) => {
+      const { left, top, right, bottom } = selectBoxes[boxId];
+      for (let i = top; i <= bottom; i++) {
+        for (let j = left; j <= right; j++) {
+          const posId = `${i}-${j}`;
+          if (!posMap[posId]) {
+            posMap[posId] = new Set();
+          }
+          if (i === top || i === bottom || j === left || j === right) {
+            if (i === top && j === left) {
+              posMap[posId].add('left-top');
+            }
+            if (i === top && j === right) {
+              posMap[posId].add('right-top');
+            }
+            if (i === bottom && j === left) {
+              posMap[posId].add('left-bottom');
+            }
+            if (i === bottom && j === right) {
+              posMap[posId].add('right-bottom');
+            }
+            if (j > left && j < right) {
+              if (i === top) {
+                posMap[posId].add('top');
+              }
+              if (i === bottom) {
+                posMap[posId].add('bottom');
+              }
+            }
+            if (i > top && i < bottom) {
+              if (j === left) {
+                posMap[posId].add('left');
+              }
+              if (j === right) {
+                posMap[posId].add('right');
+              }
+            }
+          } else {
+            posMap[posId].add('center');
+          }
+        }
+      }
+    });
+
+    Object.keys(posMap).forEach((posId) => {
+      const poses = posMap[posId];
+      if (
+        (poses.has('left-top') && poses.has('right-bottom')) ||
+        (poses.has('left-bottom') && poses.has('right-top'))
+      ) {
+        cellBorderMap[posId] = ['left-top', 'right-bottom'];
+      } else {
+        cellBorderMap[posId] = [...posMap[posId]];
+      }
+    });
+
+    const cellClass: Record<string, string> = {};
+    const selectedCells: SelectedCells[] = [];
+    const selectedArea: SelectedCells[][] = [];
+    const visitedCellId = new Set<string>();
+
+    Object.keys(selectBoxes).forEach((boxId) => {
+      const { left: nLeft, top: nTop, right: nRight, bottom: nBottom } = selectBoxes[boxId];
+      const cells = [];
+      for (let i = nTop; i <= nBottom; i++) {
+        for (let j = nLeft; j <= nRight; j++) {
+          const posId = `${i}-${j}`;
+          const mergeInfo = this.bodyMergeMap[i]?.[j];
+          const colspan = mergeInfo?.colspan;
+          const rowspan = mergeInfo?.rowspan;
+          cellClass[posId] = this.selectCellClassConstructor(cellBorderMap, i, j, rowspan, colspan);
+
+          if (!mergeInfo || colspan || rowspan) {
+            const cellData = {
+              row: this.virtualListProps.list[i],
+              rowIndex: i,
+              column: this.flattedColumns[j],
+              columnIndex: j,
+            };
+            cells.push(cellData);
+            if (!visitedCellId.has(posId)) {
+              selectedCells.push(cellData);
+            }
+            visitedCellId.add(posId);
+          }
+        }
+      }
+      selectedArea.push(cells);
+    });
+
+    const tableEvents = useTableEvent(this);
+    tableEvents.onCellSelection({
+      areas: selectedArea,
+      cells: selectedCells,
+    });
+    this.interaction.selectBoxes = selectBoxes;
+    this.interaction.selectCellBorderMap = cellBorderMap;
+    this.interaction.selectCellClassMap = cellClass;
+    this.forceUpdate();
+  };
+
   expandMergedSelectArea(area: { left: number; top: number; right: number; bottom: number }) {
     const { left, top, right, bottom } = area;
     const mergedArea = { ...area };
@@ -1164,10 +1296,7 @@ export class GridStore {
   }
 
   setSelectRow(rowIndex: number) {
-    // TODO 后面看看是不是要这个
-    if (this.getUIProps('highlightSelectRow')) {
-      this.selectRowId.value = this.virtualListProps.list[rowIndex].id;
-    }
+    this.selectRowId.value = this.virtualListProps.list[rowIndex].id;
   }
 
   getSelectCol() {
@@ -1175,9 +1304,43 @@ export class GridStore {
   }
 
   setSelectCol(colIndex: number) {
-    if (this.getUIProps('highlightSelectCol')) {
-      this.selectColId.value = this.flattedColumns[colIndex]._id;
-    }
+    this.selectColId.value = this.flattedColumns[colIndex]._id;
+  }
+
+  setRowSelection(
+    areaId = nanoid(4),
+    startRowIndex: number,
+    endRowIndex: number,
+    isMulti: boolean,
+  ) {
+    this.handleSelectionChange(
+      areaId,
+      {
+        left: 0,
+        right: this.flattedColumns.length,
+        top: startRowIndex,
+        bottom: endRowIndex,
+      },
+      isMulti,
+    );
+  }
+
+  setColumnSelection(
+    areaId = nanoid(4),
+    startColumnIndex: number,
+    endColumnIndex: number,
+    isMulti: boolean,
+  ) {
+    this.handleSelectionChange(
+      areaId,
+      {
+        left: startColumnIndex,
+        right: endColumnIndex,
+        top: 0,
+        bottom: this.virtualListProps.list.length,
+      },
+      isMulti,
+    );
   }
 
   initVirtualListRef(elRef: GridStore['virtualListRef']) {

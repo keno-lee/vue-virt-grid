@@ -13,6 +13,7 @@
         @click="onClick"
         @dblclick="onDblclick"
         @contextmenu="onContextmenu"
+        @mousedown="onMouseDown"
       >
         <colgroup :key="gridStore.watchData.renderKey">
           <col v-for="column in leftFixedColumns" :key="column._id" :width="column.width" />
@@ -193,7 +194,7 @@ const emitFunction = {
   },
   itemResize: (id: string, height: number) => {
     const lastHeight =
-      gridStore.watchData.rowHeightMap.get(String(id)) ?? props.options.rowMinHeight;
+      gridStore.watchData.rowHeightMap.get(String(id)) ?? gridStore.virtualListProps.minSize;
     gridStore.watchData.rowHeightMap.set(String(id), Math.max(lastHeight, height));
   },
   toTop: () => {},
@@ -214,7 +215,7 @@ const {
 
 const tableRefEl = ref<HTMLElement>();
 const rootRefEl = ref<HTMLElement>();
-const { onClick, onDblclick, onContextmenu } = useContentEvent(gridStore);
+const { onClick, onDblclick, onContextmenu, onMouseDown } = useContentEvent(gridStore);
 
 function getComponent(row: ListItem) {
   switch (row.type) {
@@ -231,6 +232,9 @@ const cls = computed(() => ({
   body: [
     gridStore.getUIProps('border') ? 'vtg-main--border' : '',
     gridStore.getUIProps('highlightHoverRow') ? 'vtg-main--highlight-hover-row' : '',
+    gridStore.getUIProps('highlightSelectRow') ? 'vtg-main--highlight-select-row' : '',
+    gridStore.getUIProps('highlightSelectCol') ? 'vtg-main--highlight-select-col' : '',
+    gridStore.getUIProps('highlightSelectCell') ? 'vtg-main--highlight-select-cell' : '',
   ],
   table: ['vtg-table', gridStore.gridScrollingStatus.value],
   leftFixedShadow: [

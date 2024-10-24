@@ -67,10 +67,6 @@ export const useContentEvent = (gridStore: GridStore) => {
     if (tdData) {
       gridStore.eventEmitter.emit(CellEventEnum.CellClick, tdData);
       gridStore.eventEmitter.emit(RowEventEnum.RowClick, tdData);
-
-      gridStore.popperStore.remove();
-
-      gridStore.popperStore.coverRender(tdData);
     }
   };
   const onDblclick = (e: MouseEvent) => {
@@ -103,9 +99,27 @@ export const useContentEvent = (gridStore: GridStore) => {
       gridStore.eventEmitter.emit(RowEventEnum.RowContextmenu, tdData);
     }
   };
+  const onMouseDown = (e: MouseEvent) => {
+    const path = e.composedPath() as HTMLElement[];
+    // const targetTr = path.find((el) => el.tagName === 'TR');
+    const targetTd = path.find((el) => el.tagName === 'TD');
+    // console.log(targetTr, targetTr?.dataset.id);
+    // console.log(targetTd, targetTd?.dataset.rowidx, targetTd?.dataset.colidx);
+
+    if (targetTd?.dataset.rowidx !== undefined) {
+      gridStore.setSelectRow(Number(targetTd?.dataset.rowidx));
+    }
+    if (targetTd?.dataset.colidx !== undefined) {
+      gridStore.setSelectCol(Number(targetTd?.dataset.colidx));
+    }
+    gridStore.popperStore.remove();
+    const tdData = checkAndGetTdInfo(e, gridStore);
+    gridStore.popperStore.coverRender(tdData);
+  };
   return {
     onClick,
     onDblclick,
     onContextmenu,
+    onMouseDown,
   };
 };

@@ -134,7 +134,7 @@ export default defineComponent({
       leftPadding: () => ['vtg-td'],
       main: (column: ColumnItem) => [
         'vtg-td',
-        `overflow-${gridStore.getUIProps('showOverflow')}`,
+        gridStore.getUIProps('showOverflow') && `overflow-${gridStore.getUIProps('showOverflow')}`,
         column._id === selectColId.value && 'current-column',
         gridStore.getSelectionClass(props.rowIndex, column),
         getCellClass(column),

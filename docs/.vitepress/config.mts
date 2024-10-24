@@ -74,7 +74,16 @@ export default defineConfig({
             { text: '展开', link: '/examples/expand/' },
             { text: '树形', link: '/examples/tree/' },
             { text: '分组', link: '/examples/group/' },
-            { text: '合并单元格', link: '/examples/merge/' },
+            {
+              text: '合并单元格',
+              collapsed: false,
+              items: [
+                { text: '表身合并', link: '/examples/merge/body/' },
+                { text: '表头合并', link: '/examples/merge/header/' },
+                // 下一期
+                // { text: '表尾合并', link: '/examples/merge/' },
+              ],
+            },
             // { text: '表尾' },
             {
               text: '列渲染',

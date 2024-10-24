@@ -38,6 +38,7 @@
     padding: 0;
     -webkit-tap-highlight-color: transparent;
     box-sizing: border-box;
+    // 不能用表格的边框，样式不好看
     border: unset;
   }
 }
@@ -60,17 +61,60 @@
   height: 100%;
   overflow: auto;
   position: relative;
+  font-size: 14px;
+  border: 1px solid transparent;
 
   // 边框样式
   &.vtg-main--border {
-    border: var(--#{$prefix}-border);
+    border-color: var(--#{$prefix}-border-color);
 
     th.vtg-th {
-      border-right: var(--#{$prefix}-border);
+      border-color: var(--#{$prefix}-border-color);
     }
 
     td.vtg-td {
-      border-right: var(--#{$prefix}-border);
+      border-color: var(--#{$prefix}-border-color);
+    }
+  }
+
+  // highlight
+  // hover
+  &.vtg-main--highlight-hover-row {
+    tr.vtg-tr:hover {
+      & > td.vtg-td {
+        background-color: var(--#{$prefix}-row-hover-bg-color);
+      }
+    }
+  }
+  // select
+  &.vtg-main--highlight-select-row {
+    tr.vtg-tr.current-row {
+      td.vtg-td {
+        background-color: var(--#{$prefix}-current-row-bg-color);
+      }
+    }
+  }
+  &.vtg-main--highlight-select-col {
+    td.vtg-td.current-column {
+      background-color: var(--#{$prefix}-current-column-bg-color);
+    }
+  }
+  &.vtg-main--highlight-select-cell {
+    tr.vtg-tr.current-row td.vtg-td.current-column {
+      position: relative;
+
+      &::after {
+        box-sizing: border-box;
+        display: block;
+        content: ' ';
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        position: absolute;
+        left: -1px;
+        top: -1px;
+        pointer-events: none;
+        border: 2px solid red;
+      }
     }
   }
 }
@@ -90,29 +134,11 @@
   color: var(--#{$prefix}-header-text-color);
 }
 
-// 样式覆盖
-.vtg-main--highlight-hover-row {
-  tr.vtg-tr:hover {
-    & > td.vtg-td {
-      background-color: var(--#{$prefix}-row-hover-bg-color);
-    }
-  }
-}
-
-// 暂时好像没用
-// .vtg-main--highlight-hover-col {
-//   tr.vtg-tr:hover {
-//     & > td.vtg-td {
-//       background-color: var(--#{$prefix}-row-hover-bg-color);
-//     }
-//   }
-// }
-
 // 表格
 table.vtg-table {
   display: table;
-  // border-collapse: separate;
-  border-collapse: collapse;
+  // 解决列冻结border问题
+  border-collapse: separate;
   min-width: 100%;
   table-layout: fixed;
   border-spacing: 0;
@@ -203,6 +229,7 @@ thead.vtg-header {
     box-sizing: border-box;
     font-weight: 600;
     border-bottom: var(--#{$prefix}-border);
+    border-right: 1px solid transparent;
     height: 36px;
     min-width: 0;
     text-overflow: ellipsis;
@@ -243,17 +270,7 @@ tbody.vtg-body {
       }
     }
 
-    &.current-row {
-      td.vtg-td {
-        background-color: var(--#{$prefix}-current-row-bg-color);
-      }
-    }
-
     &:hover {
-      // & > td.vtg-td {
-      //   background-color: var(--#{$prefix}-row-hover-bg-color);
-      // }
-
       td.vtg-td.vtg-td--expand {
         background-color: var(--#{$prefix}-expanded-cell-bg-color);
       }
@@ -262,6 +279,7 @@ tbody.vtg-body {
 
   td.vtg-td {
     border-bottom: var(--#{$prefix}-border);
+    border-right: 1px solid transparent;
     min-width: 0;
     box-sizing: border-box;
     text-overflow: ellipsis;
@@ -285,10 +303,6 @@ tbody.vtg-body {
         width: 100%;
         padding: 8px 4px;
       }
-    }
-
-    &.current-column {
-      background-color: var(--#{$prefix}-current-column-bg-color);
     }
 
     &.is-fixed {
@@ -384,7 +398,7 @@ tbody.vtg-body {
     box-sizing: border-box;
     white-space: normal;
     word-break: break-all;
-    padding: 8px 12px;
+    padding: 4px 6px;
 
     &.vtg-cell__index {
       text-align: center;
@@ -522,6 +536,7 @@ tbody.vtg-body {
   z-index: 5;
   position: absolute;
   background-color: #fff;
+  border: 2px solid var(--#{$prefix}-select-border-color);
 }
 
 // TODO

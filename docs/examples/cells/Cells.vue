@@ -7,6 +7,8 @@
         :options="{
           border: true,
           highlightSelectRow: true,
+          highlightSelectCol: true,
+          highlightSelectCell: true,
           ...customConfig,
         }"
       ></Grid>
@@ -66,7 +68,7 @@ const columns: Column[] = [
     title: '加载element-plus组件',
     width: 200,
     cellCoverRender: (column: Column, row: ListItem, tdData: any) => (
-      <ElSelect placeholder="Select" size="large" style="width: 100%">
+      <ElSelect placeholder="Select" size="small" style="width: 100%">
         <ElOption label="11" value="11" />
         <ElOption label="22" value="22" />
       </ElSelect>

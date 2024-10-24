@@ -5,9 +5,10 @@
         :columns="columns"
         :list="list"
         :options="{
+          border: true,
           highlightSelectRow: true,
           highlightSelectCol: true,
-          selection: true,
+          highlightSelectCell: true,
         }"
       ></Grid>
     </div>

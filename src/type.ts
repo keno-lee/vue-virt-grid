@@ -291,6 +291,8 @@ export interface TableOptions {
   highlightSelectRow?: boolean;
   // 是否高亮当前选中列
   highlightSelectCol?: boolean;
+  // 是否高亮当前选中单元格
+  highlightSelectCell?: boolean;
   // TODO 要改一个命名 是否支持框选
   selection?: boolean;
 

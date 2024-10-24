@@ -183,10 +183,10 @@ export const createPopper = ({
     console.log('检测越界', mountEl.getBoundingClientRect());
   } else {
     // center
-    popperContainer.style.left = `${referenceLeft - mountElLeft + scrollLeft - 1}px`;
-    popperContainer.style.top = `${referenceTop - mountElTop + scrollTop - 1}px`;
-    popperContainer.style.width = `${referenceWidth - 1}px`;
-    popperContainer.style.height = `${referenceHeight - 1}px`;
+    popperContainer.style.left = `${referenceLeft - mountElLeft + scrollLeft - 2}px`;
+    popperContainer.style.top = `${referenceTop - mountElTop + scrollTop - 2}px`;
+    popperContainer.style.width = `${referenceWidth + 1}px`;
+    popperContainer.style.height = `${referenceHeight + 1}px`;
   }
 
   mountEl.appendChild(popperContainer);
@@ -203,5 +203,5 @@ export const createPopper = ({
         mountEl.removeChild(popperContainer);
       }
     });
-  }, 0);
+  }, 500);
 };
